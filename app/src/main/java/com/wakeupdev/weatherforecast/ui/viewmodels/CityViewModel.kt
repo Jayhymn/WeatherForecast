@@ -18,10 +18,10 @@ class CityViewModel @Inject constructor(
     private val _weatherData = MutableLiveData<WeatherData>()
     val weatherData: LiveData<WeatherData> = _weatherData
 
-    fun getWeather(cityName: String) {
+    fun getWeather(lat: Double, lon: Double, cityName: String) {
         viewModelScope.launch {
             try {
-                val data = weatherRepository.getWeatherData(cityName)
+                val data = weatherRepository.getWeatherData(lat, lon, cityName)
                 _weatherData.value = data
             } catch (e: Exception) {
                 // Handle error
