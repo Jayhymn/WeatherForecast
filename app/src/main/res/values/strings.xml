@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WeatherForecast</string>
+    <string name="load_error">Could not load data</string>
 </resources>

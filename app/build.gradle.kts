@@ -63,6 +63,10 @@ dependencies {
     implementation(libs.androidx.junit.ktx)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
+
     testImplementation(libs.testng)
     testImplementation(libs.hilt.android.testing)
     annotationProcessor(libs.androidx.room.compiler)
