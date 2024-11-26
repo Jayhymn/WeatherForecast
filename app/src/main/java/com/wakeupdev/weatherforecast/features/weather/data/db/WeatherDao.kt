@@ -7,8 +7,8 @@ import androidx.room.Query
 
 @Dao
 interface WeatherDao {
-    @Query("SELECT * FROM weather WHERE cityName = :cityName LIMIT 1")
-    suspend fun getWeatherData(cityName: String): WeatherEntity?
+    @Query("SELECT * FROM weather WHERE latitude = :lat AND longitude =:lon LIMIT 1")
+    suspend fun getWeatherData(lat: Double, lon: Double): WeatherEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWeatherData(weatherEntity: WeatherEntity)

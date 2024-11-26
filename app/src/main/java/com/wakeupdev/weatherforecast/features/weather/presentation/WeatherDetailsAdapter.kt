@@ -37,8 +37,8 @@ class WeatherDetailsAdapter(
                 dailyForecast.minTemperature,
                 dailyForecast.maxTemperature
             )
-            // Bind weather icon and other data as required
-            // You can use Glide or Coil to load the weather icon image
+
+            setWeatherIcon(dailyForecast.weatherIcon)
         }
 
         private fun setWeatherIcon(iconId: String) {

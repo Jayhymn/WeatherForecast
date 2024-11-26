@@ -26,7 +26,7 @@ class WeatherRepository @Inject constructor(
             weatherData
         } catch (e: Exception) {
             // Fetch from cache if available
-            val cachedData = weatherDao.getWeatherData(cityName)
+            val cachedData = weatherDao.getWeatherData(lat, lon)
             cachedData?.toDomainModel() ?: throw e
         }
     }

@@ -33,22 +33,6 @@ class SearchFragment : Fragment() {
         binding.rvCitySearchResults.layoutManager = LinearLayoutManager(requireContext())
         binding.rvCitySearchResults.adapter = cityAdapter
 
-        searchViewModel.searchState.onEach { state ->
-            if (state.isLoading) {
-                // Show loading indicator
-            } else {
-                // Hide loading indicator and update the list
-                cityAdapter.submitList(state.cities)
-            }
-            state.errorMessages?.let {
-                // Show error message if any
-            }
-        }.launchIn(lifecycleScope)
-
-//        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
-//
-//        })
-
 
         return binding.root
     }

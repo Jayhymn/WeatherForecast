@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_bar_color">#121212</color>
+    <color name="primaryLight">#2E7D32</color>
+    <color name="primary">#4CAF50</color>
+    <color name="primaryVariant">#4CAF50</color>
+    <color name="secondary">#586249</color>
+    <color name="background">#FF121212</color>
+    <color name="onBackground">#E0E0E0</color>
+    <color name="surface">#222222</color>
+    <color name="surfaceVariant">#272727</color>
+    <color name="onSurface">#E0E0E0</color>
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="header_bg">#1A1A1A</color>
+    <color name="header_variant_bg">#1C1C1C</color>
+    <color name="onSecondary">#FFFFFF</color>
+    <color name="textPrimary">#FFFFFF</color>
+    <color name="textSecondary">#B0BEC5</color>
+    <color name="divider">#424242</color>
+    <color name="colorSecondaryGreyLight">#B0BEC5</color>
+    <color name="grey_out">#B0BEC5</color>
+    <color name="light_grey">#D3D3D3</color>
+    <color name="accentColor">#A0D0CB</color>
+    <color name="button_text_color">#FFFFFF</color>
+    <color name="textInputBorderColor">#A0D0CB</color>
+    <color name="bg_screen_color">#B3F2F2F4</color>
+    <color name="in_progress_color">#8be0bd</color>
+    <color name="input_border_color">#FFFFFF</color>
+</resources>

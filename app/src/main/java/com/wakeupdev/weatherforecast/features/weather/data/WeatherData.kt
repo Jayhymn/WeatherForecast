@@ -10,7 +10,7 @@ data class WeatherData(
     val minTemperature: Double,
     val maxTemperature: Double,
     val weatherIcon: String,
-    val dailyForecast: List<DailyForecast>
+    val dailyForecast: List<DailyForecast>,
 )
 
 fun WeatherData.toEntity(): WeatherEntity {
@@ -30,5 +30,6 @@ data class DailyForecast(
     val minTemperature: Double,
     val maxTemperature: Double,
     val condition: String,
+    val weatherIcon:String,
     val humidity: Double
 )

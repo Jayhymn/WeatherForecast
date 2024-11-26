@@ -26,6 +26,8 @@ fun WeatherResponse.toWeatherData(): WeatherData {
         currentTemperature = this.current.temp,
         weatherCondition = this.current.weather.getOrNull(0)?.main ?: "Unknown",
         weatherIcon = this.current.weather.getOrNull(0)?.icon ?: "",
+        maxTemperature = this.daily.getOrNull(0)?.temp?.max ?: 0.0,
+        minTemperature = this.daily.getOrNull(0)?.temp?.min ?: 0.0,
         dailyForecast = this.daily.mapNotNull { it?.toDailyForecast() }
     )
 }
@@ -37,8 +39,8 @@ fun WeatherResponse.toWeatherEntity(): WeatherEntity {
         weatherCondition = this.current.weather.getOrNull(0)?.main ?: "Unknown", // Safe call and fallback value
         weatherIcon = this.current.weather.getOrNull(0)?.icon ?: "", // Safe call and fallback value
         dailyForecast = Gson().toJson(this.daily.mapNotNull { it?.toDailyForecast() }),
-        minTemperature = this.minTemperature,
-        maxTemperature = this.maxTemperature // Safe map and filter nulls
+        maxTemperature = this.daily.getOrNull(0)?.temp?.max ?: 0.0,
+        minTemperature = this.daily.getOrNull(0)?.temp?.min ?: 0.0
     )
 }
 
@@ -103,7 +105,8 @@ data class Daily(
             minTemperature = temp.min,
             maxTemperature = temp.max,
             condition = summary,
-            humidity = humidity
+            humidity = humidity,
+            weatherIcon = weather.getOrNull(0)?.icon ?: ""
         )
     }
 }

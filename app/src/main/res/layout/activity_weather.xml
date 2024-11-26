@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/background"
+    android:background="@color/surface"
     android:padding="16dp"
     android:scrollbars="none">
 
@@ -97,7 +97,7 @@
             android:id="@+id/tvDailyForecastTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="7-Day Forecast"
+            android:text="@string/_7_day_forecast"
             android:textColor="@color/primary"
             android:textSize="18sp"
             android:textStyle="bold"

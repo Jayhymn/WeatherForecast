@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:padding="8dp">
 
     <TextView
@@ -26,8 +27,8 @@
 
     <ImageView
         android:id="@+id/ivForecastIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:contentDescription="@string/weather_icon_desc"
         android:src="@drawable/ic_clear_sky" />
 </LinearLayout>

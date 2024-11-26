@@ -15,22 +15,17 @@ import javax.inject.Inject
 class WeatherViewModel @Inject constructor(
     private val getWeatherUseCase: GetWeatherUseCase
 ) : ViewModel() {
-    private val _weatherState = MutableStateFlow(WeatherUiState())
+    private val _weatherState = MutableStateFlow<WeatherUiState>(WeatherUiState.Idle)
     val weatherState get() = _weatherState.asStateFlow()
 
     fun fetchWeatherForCity(lat: Double, lon: Double, cityName: String) {
         viewModelScope.launch {
-            _weatherState.update { it.copy(isLoading = true) }
+            _weatherState.value = WeatherUiState.Loading
             try {
                 val weatherData = getWeatherUseCase(lat, lon, cityName)
-                _weatherState.update { it.copy(weatherData = weatherData, isLoading = false) }
+                _weatherState.value = WeatherUiState.Success(weatherData)
             } catch (e: Exception) {
-                _weatherState.update {
-                    it.copy(
-                        errorMessages = it.errorMessages + R.string.load_error,
-                        isLoading = false
-                    )
-                }
+                _weatherState.value = WeatherUiState.Error(e.localizedMessage)
             }
         }
     }
