@@ -7,7 +7,10 @@ data class WeatherData(
     val cityName: String,
     val currentTemperature: Double,
     val weatherCondition: String,
-    val dailyForecast: List<DailyForecast?>
+    val minTemperature: Double,
+    val maxTemperature: Double,
+    val weatherIcon: String,
+    val dailyForecast: List<DailyForecast>
 )
 
 fun WeatherData.toEntity(): WeatherEntity {
@@ -15,6 +18,9 @@ fun WeatherData.toEntity(): WeatherEntity {
         cityName = this.cityName,
         currentTemperature = this.currentTemperature,
         weatherCondition = this.weatherCondition,
+        minTemperature = this.minTemperature,
+        maxTemperature = this.maxTemperature,
+        weatherIcon = this.weatherIcon,
         dailyForecast = Gson().toJson(this.dailyForecast)
     )
 }

@@ -12,7 +12,10 @@ data class WeatherEntity(
     @PrimaryKey val cityName: String,
     val currentTemperature: Double,
     val weatherCondition: String,
-    val dailyForecast: String // Store as JSON or serialized string
+    val weatherIcon: String,
+    val dailyForecast: String, // Store as JSON or serialized string
+    val minTemperature: Double,
+    val maxTemperature: Double
 )
 
 fun WeatherEntity.toDomainModel(): WeatherData {
@@ -20,6 +23,9 @@ fun WeatherEntity.toDomainModel(): WeatherData {
         cityName = this.cityName,
         currentTemperature = this.currentTemperature,
         weatherCondition = this.weatherCondition,
+        weatherIcon = this.weatherIcon,
+        minTemperature = this.minTemperature,
+        maxTemperature = this.maxTemperature,
         dailyForecast = Gson().fromJson(this.dailyForecast, object : TypeToken<List<DailyForecast>>() {}.type)
     )
 }

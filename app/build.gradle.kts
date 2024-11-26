@@ -48,6 +48,7 @@ android {
 
     buildFeatures {
         buildConfig = true // Enable BuildConfig generation
+        viewBinding = true
     }
 }
 
@@ -72,6 +73,12 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.glide)
+    annotationProcessor(libs.compiler)
+
+
 
     // for retrofit
     implementation (libs.retrofit)

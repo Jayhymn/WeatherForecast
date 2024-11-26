@@ -24,8 +24,9 @@ fun WeatherResponse.toWeatherData(): WeatherData {
     return WeatherData(
         cityName = this.timezone,
         currentTemperature = this.current.temp,
-        weatherCondition = this.current.weather[0].main,
-        dailyForecast = this.daily.map { it?.toDailyForecast() }
+        weatherCondition = this.current.weather.getOrNull(0)?.main ?: "Unknown",
+        weatherIcon = this.current.weather.getOrNull(0)?.icon ?: "",
+        dailyForecast = this.daily.mapNotNull { it?.toDailyForecast() }
     )
 }
 
@@ -33,10 +34,14 @@ fun WeatherResponse.toWeatherEntity(): WeatherEntity {
     return WeatherEntity(
         cityName = this.timezone,
         currentTemperature = this.current.temp,
-        weatherCondition = this.current.weather[0].main,
-        dailyForecast = Gson().toJson(this.daily.map { it?.toDailyForecast() })
+        weatherCondition = this.current.weather.getOrNull(0)?.main ?: "Unknown", // Safe call and fallback value
+        weatherIcon = this.current.weather.getOrNull(0)?.icon ?: "", // Safe call and fallback value
+        dailyForecast = Gson().toJson(this.daily.mapNotNull { it?.toDailyForecast() }),
+        minTemperature = this.minTemperature,
+        maxTemperature = this.maxTemperature // Safe map and filter nulls
     )
 }
+
 
 data class Alert(
     val description: String,

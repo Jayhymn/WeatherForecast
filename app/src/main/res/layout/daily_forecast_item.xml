@@ -1,0 +1,33 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:text="Nov 26, 2024"
+        android:textSize="14sp"
+        android:textColor="@color/primary" />
+
+    <TextView
+        android:id="@+id/tvMinMaxTemp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="18°C / 30°C"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:textColor="@color/secondary" />
+
+    <ImageView
+        android:id="@+id/ivForecastIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:contentDescription="@string/weather_icon_desc"
+        android:src="@drawable/ic_clear_sky" />
+</LinearLayout>
