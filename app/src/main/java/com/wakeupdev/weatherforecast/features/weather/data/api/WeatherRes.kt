@@ -28,6 +28,8 @@ fun WeatherResponse.toWeatherData(): WeatherData {
         weatherIcon = this.current.weather.getOrNull(0)?.icon ?: "",
         maxTemperature = this.daily.getOrNull(0)?.temp?.max ?: 0.0,
         minTemperature = this.daily.getOrNull(0)?.temp?.min ?: 0.0,
+        latitude = this.lat,
+        longitude = this.lon,
         dailyForecast = this.daily.mapNotNull { it?.toDailyForecast() }
     )
 }
@@ -40,6 +42,8 @@ fun WeatherResponse.toWeatherEntity(): WeatherEntity {
         weatherIcon = this.current.weather.getOrNull(0)?.icon ?: "", // Safe call and fallback value
         dailyForecast = Gson().toJson(this.daily.mapNotNull { it?.toDailyForecast() }),
         maxTemperature = this.daily.getOrNull(0)?.temp?.max ?: 0.0,
+        latitude = this.lat,
+        longitude = this.lon,
         minTemperature = this.daily.getOrNull(0)?.temp?.min ?: 0.0
     )
 }

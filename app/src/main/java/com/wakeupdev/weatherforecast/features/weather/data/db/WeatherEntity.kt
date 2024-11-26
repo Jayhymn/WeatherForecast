@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.wakeupdev.weatherforecast.features.weather.data.DailyForecast
 import com.wakeupdev.weatherforecast.features.weather.data.WeatherData
+import com.wakeupdev.weatherforecast.features.weather.data.api.toWeatherData
 
 @Entity(tableName = "weather")
 data class WeatherEntity(
@@ -16,6 +17,8 @@ data class WeatherEntity(
     val dailyForecast: String, // Store as JSON or serialized string
     val minTemperature: Double,
     val maxTemperature: Double,
+    val latitude: Double,
+    val longitude: Double
 )
 
 fun WeatherEntity.toDomainModel(): WeatherData {
@@ -26,6 +29,8 @@ fun WeatherEntity.toDomainModel(): WeatherData {
         minTemperature = this.minTemperature,
         maxTemperature = this.maxTemperature,
         weatherIcon = this.weatherIcon,
+        latitude = this.latitude,
+        longitude = this.longitude,
         dailyForecast = Gson().fromJson(this.dailyForecast, object : TypeToken<List<DailyForecast>>() {}.type),
     )
 }

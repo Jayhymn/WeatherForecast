@@ -54,20 +54,35 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideWeatherApiService(): WeatherApiService {
-        val httpClient = OkHttpClient.Builder()
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
             .connectTimeout(Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS)
             .readTimeout(Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS)
             .writeTimeout(Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS)
             .addInterceptor(ApiKeyInterceptor()) // Custom interceptor to append API key
             .build()
+    }
 
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL) // Base URL of the API
             .addConverterFactory(GsonConverterFactory.create()) // JSON parsing
-            .client(httpClient) // Attach OkHttp client with the interceptor
+            .client(okHttpClient) // Attach OkHttp client with the interceptor
             .build()
-            .create(WeatherApiService::class.java) // Create WeatherApiService instance
+    }
+
+    @Provides
+    @Singleton
+    fun provideWeatherApiService(retrofit: Retrofit): WeatherApiService {
+        return retrofit.create(WeatherApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGeocodingApiService(retrofit: Retrofit): GeocodingApiService {
+        return retrofit.create(GeocodingApiService::class.java)
     }
 
     @Provides
