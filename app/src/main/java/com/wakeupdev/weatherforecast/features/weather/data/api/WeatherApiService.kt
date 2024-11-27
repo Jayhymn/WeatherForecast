@@ -9,6 +9,7 @@ interface WeatherApiService {
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
         @Query("cnt") numberOfDays: Int = 7,
+        @Query("units") units: String = "metric"
     ): WeatherResponse
 
 //    @GET("data/2.5/group")

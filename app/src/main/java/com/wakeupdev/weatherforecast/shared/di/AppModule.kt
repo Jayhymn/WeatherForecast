@@ -2,16 +2,18 @@ package com.wakeupdev.weatherforecast.shared.di
 
 import android.content.Context
 import androidx.room.Room
-import com.wakeupdev.weatherforecast.shared.Constants
-import com.wakeupdev.weatherforecast.shared.ApiKeyInterceptor
-import com.wakeupdev.weatherforecast.features.city.data.api.GeocodingApiService
-import com.wakeupdev.weatherforecast.features.weather.data.api.WeatherApiService
-import com.wakeupdev.weatherforecast.shared.LocalDatabase
-import com.wakeupdev.weatherforecast.features.city.data.db.CityDao
-import com.wakeupdev.weatherforecast.features.weather.data.db.WeatherDao
+import com.wakeupdev.weatherforecast.BuildConfig
 import com.wakeupdev.weatherforecast.features.city.data.CityRepository
+import com.wakeupdev.weatherforecast.features.city.data.api.GeocodingApiService
+import com.wakeupdev.weatherforecast.features.city.data.db.CityDao
 import com.wakeupdev.weatherforecast.features.weather.data.WeatherRepository
+import com.wakeupdev.weatherforecast.features.weather.data.api.WeatherApiService
+import com.wakeupdev.weatherforecast.features.weather.data.db.WeatherDao
+import com.wakeupdev.weatherforecast.shared.ApiKeyInterceptor
+import com.wakeupdev.weatherforecast.shared.Constants
+import com.wakeupdev.weatherforecast.shared.LocalDatabase
 import com.wakeupdev.weatherforecast.shared.domain.FormatDateUseCase
+import com.wakeupdev.weatherforecast.shared.domain.GetCityUseCase
 import com.wakeupdev.weatherforecast.shared.domain.GetWeatherUseCase
 import dagger.Module
 import dagger.Provides
@@ -19,6 +21,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -54,13 +58,41 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideLogInterceptort(): HttpLoggingInterceptor {
+        val loggingInterceptor = HttpLoggingInterceptor()
+
+        if (BuildConfig.DEBUG) {
+            loggingInterceptor
+                .setLevel(HttpLoggingInterceptor.Level.HEADERS)
+                .setLevel(HttpLoggingInterceptor.Level.BODY)
+        } else {
+            loggingInterceptor
+                .setLevel(HttpLoggingInterceptor.Level.HEADERS)
+        }
+
+        return loggingInterceptor
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .connectTimeout(Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS)
             .readTimeout(Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS)
             .writeTimeout(Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS)
             .addInterceptor(ApiKeyInterceptor()) // Custom interceptor to append API key
+            .addInterceptor(loggingInterceptor) // Add logging interceptor
+            .addInterceptor { chain ->
+                val original = chain.request()
+                val request = original.newBuilder()
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("accept", "application/json")
+                    .method(original.method, original.body)
+                    .build()
+                chain.proceed(request)
+            }
             .build()
+
     }
 
     @Provides
@@ -111,6 +143,14 @@ object AppModule {
         weatherRepository: WeatherRepository
     ): GetWeatherUseCase {
         return GetWeatherUseCase(weatherRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetCityUseCase(
+        cityRepository: CityRepository
+    ): GetCityUseCase {
+        return GetCityUseCase(cityRepository)
     }
 
     @Provides

@@ -1,12 +1,15 @@
 package com.wakeupdev.weatherforecast.shared
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.tasks.await // This import is needed for await() to work
+import com.google.android.gms.location.Priority
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class LocationHelper @Inject constructor(
@@ -25,16 +28,27 @@ class LocationHelper @Inject constructor(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // Return null if permissions are not granted
-            return null
+            return null // Permissions are not granted
         }
 
-        // Try to get the last known location
+        // Try last known location first
+        val lastLocation = fusedLocationClient.lastLocation.await()
+        if (lastLocation != null) {
+            return lastLocation
+        }
+
+        // Request fresh location if last location is null
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000L)
+            .setMaxUpdates(1) // We only need one fresh location update
+            .build()
+
         return try {
-            fusedLocationClient.lastLocation.await() // Await the result of the location request
+            fusedLocationClient.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                null
+            ).await() // Await a fresh location update
         } catch (e: Exception) {
-            // Return null in case of any exception
-            null
+            null // Return null if location retrieval fails
         }
     }
 }

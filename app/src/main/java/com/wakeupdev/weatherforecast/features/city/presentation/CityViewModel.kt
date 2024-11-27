@@ -1,10 +1,12 @@
 package com.wakeupdev.weatherforecast.features.city.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wakeupdev.weatherforecast.R
 import com.wakeupdev.weatherforecast.features.city.data.CityRepository
 import com.wakeupdev.weatherforecast.features.city.data.api.GeocodingApiService
+import com.wakeupdev.weatherforecast.features.weather.presentation.WeatherUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,22 +20,18 @@ class CityViewModel @Inject constructor(
     private val cityRepository: CityRepository,
 ) : ViewModel() {
 
-    private val _citiesData = MutableStateFlow(CityUiState())
+    private val _citiesData = MutableStateFlow<CityUiState>(CityUiState.Idle)
     val citiesData get() = _citiesData.asStateFlow()
 
     fun searchCity(searchQuery: String) {
         viewModelScope.launch {
-            _citiesData.update { it.copy(isLoading = false) }
+            _citiesData.value = CityUiState.Loading
             try {
                 val citiesData = cityRepository.searchCity(searchQuery)
-                _citiesData.update { it.copy(citiesData = citiesData, isLoading = true) }
+                _citiesData.value = CityUiState.Success(citiesData)
             } catch (e: Exception) {
-                _citiesData.update {
-                    it.copy(
-                        errorMessages = it.errorMessages + R.string.load_error,
-                        isLoading = false
-                    )
-                }
+                Log.e("CityViewModel", "searchCity: $e", )
+                _citiesData.value = CityUiState.Error(e.localizedMessage)
             }
         }
     }
@@ -41,4 +39,12 @@ class CityViewModel @Inject constructor(
     fun saveFavoriteCity(){
 
     }
+
+    fun clearCitiesData() {
+        // Update only the `Success` state to clear the cities list
+        if (_citiesData.value is CityUiState.Success) {
+            _citiesData.value = CityUiState.Success(emptyList())  // Clear cities list
+        }
+    }
+
 }

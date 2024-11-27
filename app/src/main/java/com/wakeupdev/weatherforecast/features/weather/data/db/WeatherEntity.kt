@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.wakeupdev.weatherforecast.features.weather.data.DailyForecast
+import com.wakeupdev.weatherforecast.features.weather.data.HourlyTemperature
 import com.wakeupdev.weatherforecast.features.weather.data.WeatherData
 import com.wakeupdev.weatherforecast.features.weather.data.api.toWeatherData
 
@@ -15,9 +16,16 @@ data class WeatherEntity(
     val weatherCondition: String,
     val weatherIcon: String,
     val dailyForecast: String, // Store as JSON or serialized string
+    val hourlyForecast: String, // Store as JSON or serialized string
     val minTemperature: Double,
     val maxTemperature: Double,
     val latitude: Double,
+    val windSpeed: Double,
+    val humidity: Double,
+    val uvIndex: Double,
+    val pressure: Double,
+    val visibility: Double,
+    val dewPoint: Double,
     val longitude: Double
 )
 
@@ -31,6 +39,13 @@ fun WeatherEntity.toDomainModel(): WeatherData {
         weatherIcon = this.weatherIcon,
         latitude = this.latitude,
         longitude = this.longitude,
+        windSpeed = this.windSpeed,
+        humidity = this.humidity,
+        pressure = this.pressure,
+        dewPoint = this.dewPoint,
+        uvIndex = this.uvIndex,
+        visibility = this.visibility,
+        hourlyTemperature = Gson().fromJson(this.hourlyForecast, object : TypeToken<List<HourlyTemperature>>() {}.type),
         dailyForecast = Gson().fromJson(this.dailyForecast, object : TypeToken<List<DailyForecast>>() {}.type),
     )
 }

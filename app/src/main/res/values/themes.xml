@@ -1,6 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.WeatherForecast" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.WeatherForecast" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/onSurface</item>
+<!--        <style name="TextAppearance.App.Underlined" parent="TextAppearance.Material3.BodyLarge">-->
+<!--            <item name="android:textDecorationLine">underline</item>-->
+<!--        </style>-->
     </style>
 
     <style name="Theme.WeatherForecast" parent="Base.Theme.WeatherForecast" />

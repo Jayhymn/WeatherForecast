@@ -1,5 +1,6 @@
 package com.wakeupdev.weatherforecast.features.weather.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wakeupdev.weatherforecast.R

@@ -6,6 +6,8 @@ plugins {
     id("com.google.devtools.ksp")
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    id ("kotlin-parcelize")
+    id ("androidx.navigation.safeargs.kotlin")
 }
 
 val localProperties = Properties().apply {
@@ -58,6 +60,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
 
+    implementation (libs.okhttp.urlconnection)
+    implementation (libs.logging.interceptor)
+
     // for room database
     implementation(libs.androidx.room.runtime)
     implementation(libs.core.ktx)
@@ -67,6 +72,8 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     testImplementation(libs.testng)
     testImplementation(libs.hilt.android.testing)
@@ -78,7 +85,9 @@ dependencies {
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
 
-
+    implementation (libs.play.services.location)
+    implementation (libs.play.services.maps)
+    implementation (libs.play.services.iid)
 
     // for retrofit
     implementation (libs.retrofit)
@@ -89,8 +98,10 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(libs.lottie)
+    implementation (libs.mpandroidchart)
 
     implementation(libs.androidx.core.splashscreen)
+//    implementation (libs.material.calendarview)
 
     testImplementation (libs.androidx.core.testing)
 

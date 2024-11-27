@@ -2,9 +2,27 @@
     <string name="app_name">WeatherForecast</string>
     <string name="load_error">Could not load data</string>
     <string name="weather_icon_desc">Weather Condition Icon</string>
-    <string name="min_to_max_temp">Min: %1$d°C | Max: %2$d°C</string>
-    <string name="current_temperature">%1$d°C</string>
+    <string name="min_to_max_temp">Min: %1$.0f°C        |       Max: %2$.0f°C</string>
+    <string name="min_to_max">%1$.0f°C / %2$.0f°C</string>
+    <string name="current_temperature">%1$.0f°C</string>
+    <string name="temp">%1$.0f°</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="_7_day_forecast">7-Day Forecast</string>
+    <string name="wind_m_s"> %1.0fm/s</string>
+    <string name="humidity"> %1.0f%%</string>
+    <string name="uv_index">UV index: %1.0f</string>
+    <string name="pressure_hpa"> %1.0f hpa</string>
+    <string name="visibility_km">Vis: %1.0f km</string>
+    <string name="dew_point_c">Dew: %1.0f°C</string>
+    <string name="temperature">Temperature</string>
+    <string name="min_temp">L: %1$.0f°</string>
+    <string name="max_temp">H: %1$.0f°</string>
+    <string name="next_7_days"><u>Next 7 Days  </u></string>
+    <string name="title_home">Home</string>
+    <string name="title_daily">search</string>
+    <string name="title_search">search</string>
+    <string name="title_favorites">Favorites</string>
+    <string name="title_profile">Profile</string>
+    <string name="favorite_locations">Favorite Locations</string>
 </resources>

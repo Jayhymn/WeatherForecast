@@ -2,10 +2,10 @@ package com.wakeupdev.weatherforecast.features.weather.data.api
 
 import com.google.gson.Gson
 import com.wakeupdev.weatherforecast.features.weather.data.DailyForecast
+import com.wakeupdev.weatherforecast.features.weather.data.HourlyTemperature
 import com.wakeupdev.weatherforecast.features.weather.data.WeatherData
 import com.wakeupdev.weatherforecast.features.weather.data.db.WeatherEntity
-import com.wakeupdev.weatherforecast.shared.domain.FormatDateUseCase
-import javax.inject.Inject
+import com.wakeupdev.weatherforecast.shared.utils.FormatDateUtil
 
 data class WeatherResponse(
     val alerts: List<Alert?>,
@@ -16,7 +16,7 @@ data class WeatherResponse(
     val lon: Double,
     val minutely: List<Minutely?>,
     val timezone: String,
-    val timezone_offset: Int
+    val timezone_offset: Double
 )
 
 
@@ -30,6 +30,13 @@ fun WeatherResponse.toWeatherData(): WeatherData {
         minTemperature = this.daily.getOrNull(0)?.temp?.min ?: 0.0,
         latitude = this.lat,
         longitude = this.lon,
+        windSpeed = this.current.wind_speed ?: 0.0,
+        humidity = this.current.humidity ?: 0.0,
+        pressure = this.current.pressure ?: 0.0,
+        dewPoint = this.current.dew_point ?: 0.0,
+        uvIndex = this.current.uvi ?: 0.0,
+        visibility = this.current.visibility ?: 0.0,
+        hourlyTemperature = this.hourly.mapNotNull { it?.toHourlyTemperature() },
         dailyForecast = this.daily.mapNotNull { it?.toDailyForecast() }
     )
 }
@@ -37,75 +44,78 @@ fun WeatherResponse.toWeatherData(): WeatherData {
 fun WeatherResponse.toWeatherEntity(): WeatherEntity {
     return WeatherEntity(
         cityName = this.timezone,
-        currentTemperature = this.current.temp,
+        currentTemperature = this.current.temp ?: 0.0,
         weatherCondition = this.current.weather.getOrNull(0)?.main ?: "Unknown", // Safe call and fallback value
         weatherIcon = this.current.weather.getOrNull(0)?.icon ?: "", // Safe call and fallback value
         dailyForecast = Gson().toJson(this.daily.mapNotNull { it?.toDailyForecast() }),
         maxTemperature = this.daily.getOrNull(0)?.temp?.max ?: 0.0,
         latitude = this.lat,
         longitude = this.lon,
+        windSpeed = this.current.wind_speed ?: 0.0,
+        humidity = this.current.humidity ?: 0.0,
+        pressure = this.current.pressure ?: 0.0,
+        dewPoint = this.current.dew_point ?: 0.0,
+        uvIndex = this.current.uvi ?: 0.0,
+        visibility = this.current.visibility ?: 0.0,
+        hourlyForecast = Gson().toJson(this.hourly.mapNotNull { it?.toHourlyTemperature() }),
         minTemperature = this.daily.getOrNull(0)?.temp?.min ?: 0.0
     )
 }
 
 
 data class Alert(
-    val description: String,
-    val end: Int,
-    val event: String,
-    val sender_name: String,
-    val start: Int,
+    val description: String?,
+    val end: Double?,
+    val event: String?,
+    val sender_name: String?,
+    val start: Double?,
     val tags: List<Any>
 )
 
 data class Current(
-    val clouds: Int,
-    val dew_point: Double,
-    val dt: Int,
-    val feels_like: Double,
-    val humidity: Double,
-    val pressure: Double,
-    val sunrise: Int,
-    val sunset: Int,
-    val temp: Double,
-    val uvi: Double,
-    val visibility: Int,
+    val clouds: Double?,
+    val dew_point: Double?,
+    val dt: Double?,
+    val feels_like: Double?,
+    val humidity: Double?,
+    val pressure: Double?,
+    val sunrise: Double?,
+    val sunset: Double?,
+    val temp: Double?,
+    val uvi: Double?,
+    val visibility: Double?,
     val weather: List<Weather>,
-    val wind_deg: Int,
-    val wind_gust: Double,
-    val wind_speed: Double
+    val wind_deg: Double?,
+    val wind_gust: Double?,
+    val wind_speed: Double?
 )
 
 data class Daily(
-    val clouds: Int,
-    val dew_point: Double,
-    val dt: Int,
+    val clouds: Double?,
+    val dew_point: Double?,
+    val dt: Long?,
     val feels_like: FeelsLike,
-    val humidity: Double,
-    val moon_phase: Double,
-    val moonrise: Int,
-    val moonset: Int,
-    val pop: Double,
-    val pressure: Int,
-    val rain: Double,
+    val humidity: Double?,
+    val moon_phase: Double?,
+    val moonrise: Long?,
+    val moonset: Long?,
+    val pop: Double?,
+    val pressure: Double?,
+    val rain: Double?,
     val summary: String,
-    val sunrise: Int,
-    val sunset: Int,
+    val sunrise: Long?,
+    val sunset: Long?,
     val temp: Temp,
-    val uvi: Double,
+    val uvi: Double?,
     val weather: List<Weather>,
-    val wind_deg: Int,
-    val wind_gust: Double,
-    val wind_speed: Double
+    val wind_deg: Double?,
+    val wind_gust: Double?,
+    val wind_speed: Double?,
 ) {
-    @Inject
-    lateinit var formatDateUseCase: FormatDateUseCase
-
-    private val formattedDate = formatDateUseCase(dt.toLong())
 
     fun toDailyForecast() : DailyForecast {
         return DailyForecast(
-            date = formattedDate,
+            date = FormatDateUtil.formatToDate(dt),
             minTemperature = temp.min,
             maxTemperature = temp.max,
             condition = summary,
@@ -116,25 +126,33 @@ data class Daily(
 }
 
 data class Hourly(
-    val clouds: Int,
+    val clouds: Double,
     val dew_point: Double,
-    val dt: Int,
+    val dt: Long,
     val feels_like: Double,
-    val humidity: Int,
+    val humidity: Double,
     val pop: Double,
-    val pressure: Int,
+    val pressure: Double,
     val temp: Double,
-    val uvi: Int,
-    val visibility: Int,
+    val uvi: Double,
+    val visibility: Double,
     val weather: List<Weather>,
-    val wind_deg: Int,
+    val wind_deg: Double,
     val wind_gust: Double,
     val wind_speed: Double
-)
+){
+    fun toHourlyTemperature() : HourlyTemperature {
+        return HourlyTemperature(
+            date = FormatDateUtil.formatToTime(dt),
+            temperature = temp,
+            weatherIcon = weather[0].icon
+        )
+    }
+}
 
 data class Minutely(
-    val dt: Int,
-    val precipitation: Int
+    val dt: Double,
+    val precipitation: Double
 )
 
 data class Weather(
