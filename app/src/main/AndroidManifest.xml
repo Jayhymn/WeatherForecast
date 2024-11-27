@@ -17,8 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WeatherForecast"
         tools:targetApi="31">
-        <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCNzqXWkzwYheL_Qe_yAbgsymaUOXXzoog"/>
 
         <!-- If you want to disable android.startup completely. -->
         <provider
