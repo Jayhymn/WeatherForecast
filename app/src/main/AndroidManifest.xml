@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="com.wakeupdev.weatherforecast.shared.WeatherApp"
+        android:name="com.wakeupdev.weatherforecast.WeatherApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -31,7 +31,7 @@
                 tools:node="remove" />
         </provider>
         <activity
-            android:name=".features.weather.presentation.WeatherActivity"
+            android:name=".presentation.WeatherActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
