@@ -1,6 +1,7 @@
 package com.wakeupdev.weatherforecast.ui.fragments
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -8,8 +9,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
-import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -21,6 +22,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -32,36 +35,37 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.snackbar.Snackbar
 import com.wakeupdev.weatherforecast.Constants.LOCATION_PERMISSION_REQUEST_CODE
 import com.wakeupdev.weatherforecast.R
 import com.wakeupdev.weatherforecast.data.api.City
-import com.wakeupdev.weatherforecast.databinding.FragmentFavoriteLocationBinding
+import com.wakeupdev.weatherforecast.databinding.FragmentFavoriteCitiesBinding
 import com.wakeupdev.weatherforecast.ui.CityUiState
 import com.wakeupdev.weatherforecast.ui.adapters.CitySearchAdapter
-import com.wakeupdev.weatherforecast.ui.adapters.FavoriteLocationAdapter
+import com.wakeupdev.weatherforecast.ui.adapters.FavoriteCitiesAdapter
 import com.wakeupdev.weatherforecast.ui.viewmodels.CityViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FavoriteLocationFragment : Fragment(R.layout.fragment_favorite_location),
+class FavoriteCitiesFragment : Fragment(R.layout.fragment_favorite_cities),
     GoogleMap.OnMarkerClickListener,
     OnMapReadyCallback,
-    FavoriteLocationAdapter.CityItemListener, CitySearchAdapter.SearchResultListener {
+    FavoriteCitiesAdapter.FavoriteCityListener, CitySearchAdapter.SearchResultListener {
 
     private val cityViewModel: CityViewModel by viewModels()
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var googleMap: GoogleMap? = null
-    private lateinit var searchBinding: FragmentFavoriteLocationBinding
-    private lateinit var favoriteLocationAdapter: FavoriteLocationAdapter
+    private lateinit var searchBinding: FragmentFavoriteCitiesBinding
+    private lateinit var favoriteLocationAdapter: FavoriteCitiesAdapter
     private lateinit var citySearchAdapter: CitySearchAdapter
     private lateinit var searchView: SearchView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        searchBinding = FragmentFavoriteLocationBinding.bind(view)
+        searchBinding = FragmentFavoriteCitiesBinding.bind(view)
 
         // Initialize FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
@@ -102,11 +106,15 @@ class FavoriteLocationFragment : Fragment(R.layout.fragment_favorite_location),
                 searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
                         query?.let { cityViewModel.searchCity(it) }
+                        hideKeyboard()
                         return true
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
                         // Optional: Handle text changes
+                        if (newText?.isEmpty() == true){
+                            cityViewModel.clearSearchCitiesData()
+                        }
                         return true
                     }
                 })
@@ -122,11 +130,21 @@ class FavoriteLocationFragment : Fragment(R.layout.fragment_favorite_location),
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
+    private fun hideKeyboard() {
+        // Get the InputMethodManager system service
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = requireActivity().currentFocus ?: View(requireContext()) // Get the current focus view or create a new one
+
+        // Hide the soft keyboard
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
     private fun setupSearchFragment(){
         val rvSearchResults = searchBinding.recyclerSearchResults
         citySearchAdapter = CitySearchAdapter(emptyList(), this)
         rvSearchResults.adapter = citySearchAdapter
         rvSearchResults.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        val dividerItemDecoration = DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
+        rvSearchResults.addItemDecoration(dividerItemDecoration)
     }
 
     private fun handleBackButton() {
@@ -140,7 +158,7 @@ class FavoriteLocationFragment : Fragment(R.layout.fragment_favorite_location),
 
     private fun showFavLocations() {
         val rvFavLocations = searchBinding.favLocation.rvFavLocs
-        favoriteLocationAdapter = FavoriteLocationAdapter(emptyList(), this)
+        favoriteLocationAdapter = FavoriteCitiesAdapter(emptyList(), this)
         rvFavLocations.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         rvFavLocations.adapter = favoriteLocationAdapter
@@ -159,7 +177,7 @@ class FavoriteLocationFragment : Fragment(R.layout.fragment_favorite_location),
                             resources.getColor(R.color.color_default_background_grey, null)
                         )
                         searchBinding.favLocation.totalOutlets.visibility = View.GONE
-                        searchBinding.favLocation.totalOutletsSummary.visibility = View.VISIBLE
+                        searchBinding.favLocation.tvTotalFavCities.visibility = View.VISIBLE
                     }
 
                     BottomSheetBehavior.STATE_DRAGGING -> {
@@ -168,7 +186,7 @@ class FavoriteLocationFragment : Fragment(R.layout.fragment_favorite_location),
 
                     BottomSheetBehavior.STATE_COLLAPSED -> {
                         searchBinding.favLocation.totalOutlets.visibility = View.VISIBLE
-                        searchBinding.favLocation.totalOutletsSummary.visibility = View.GONE
+                        searchBinding.favLocation.tvTotalFavCities.visibility = View.GONE
                         searchBinding.favLocation.bottomSheetIndicatorView.visibility = View.VISIBLE
                         searchBinding.favLocation.bottomSheetContainer.setBackgroundColor(0)
                     }
@@ -208,7 +226,7 @@ class FavoriteLocationFragment : Fragment(R.layout.fragment_favorite_location),
             location?.let {
                 val currentLatLng = LatLng(it.latitude, it.longitude)
                 googleMap?.apply {
-                    moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+                    moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
                     addMarker(MarkerOptions().position(currentLatLng).title("You are here"))
                 }
             }
@@ -230,24 +248,49 @@ class FavoriteLocationFragment : Fragment(R.layout.fragment_favorite_location),
                     citiesSearchState to favCitiesState
                 }.collect { (citiesSearchState, favCitiesState) ->
                     when (citiesSearchState) {
-                        is CityUiState.Success -> citySearchAdapter.updateCities(citiesSearchState.citiesData)
-                        else -> Unit // Handle other states if needed
+                        is CityUiState.Success -> {
+                            searchBinding.progressBar.visibility = View.GONE
+                            if (citiesSearchState.citiesData.isEmpty()){
+                                searchBinding.recyclerSearchResults.visibility = View.GONE
+                            } else {
+                                searchBinding.recyclerSearchResults.visibility = View.VISIBLE
+                            }
+                            citySearchAdapter.updateCities(citiesSearchState.citiesData)
+                        }
+
+                        is CityUiState.Loading -> {
+                            searchBinding.progressBar.visibility = View.VISIBLE
+                            searchBinding.recyclerSearchResults.visibility = View.VISIBLE
+                        }
+
+                        is CityUiState.Error -> {
+                            searchBinding.progressBar.visibility = View.GONE
+                            Snackbar.make(searchBinding.root, "Please check your connection and retry!", Snackbar.LENGTH_SHORT).show()
+                        }
+                        else -> Unit
                     }
 
                     when (favCitiesState) {
-                        is CityUiState.Success -> favoriteLocationAdapter.updateCities(favCitiesState.citiesData)
-                        else -> Unit // Handle other states if needed
+                        is CityUiState.Success -> {
+                            favoriteLocationAdapter.updateCities(favCitiesState.citiesData)
+                            searchBinding.favLocation.tvTotalFavCities.text = "Total: ${favCitiesState.citiesData.size}"
+                        }
+                        else -> Unit
                     }
                 }
             }
         }
     }
 
-    override fun onItemClick(city: City) {
-        // Handle item click
+    override fun onFavoriteCityItemClick(city: City) {
+//        val action = FavoriteCitiesFragmentDirections.actionFavoriteCitiesFragmentToWeatherFragment(city)
+//        findNavController().navigate(action)
     }
 
     override fun onSearchItemClicked(city: City) {
+        val cityName = "${city.name}, ${city.state}, ${city.country}"
 
+        val weatherDialog = WeatherDialogFragment.newInstance(city, cityName)
+        weatherDialog.show(parentFragmentManager, "WeatherDialog")
     }
 }

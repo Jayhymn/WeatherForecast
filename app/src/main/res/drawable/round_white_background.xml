@@ -1,0 +1,5 @@
+<!-- res/drawable/round_white_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#212121"/> <!-- White color -->
+    <corners android:radius="1000dp"/>  <!-- Fully rounded corners -->
+</shape>

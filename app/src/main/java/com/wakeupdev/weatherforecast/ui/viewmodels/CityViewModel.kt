@@ -3,6 +3,7 @@ package com.wakeupdev.weatherforecast.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.wakeupdev.weatherforecast.data.api.City
 import com.wakeupdev.weatherforecast.data.repos.CityRepository
 import com.wakeupdev.weatherforecast.data.api.GeocodingApiService
 import com.wakeupdev.weatherforecast.ui.CityUiState
@@ -37,31 +38,35 @@ class CityViewModel @Inject constructor(
         }
     }
 
-    private fun getFavoriteLocations(){
+    private fun getFavoriteCities() {
         viewModelScope.launch {
             _favCities.value = CityUiState.Loading
             try {
-                val favoriteCities = cityRepository.getFavLocations()
-                _favCities.value = CityUiState.Success(favoriteCities)
-            } catch (e: Exception){
-                Log.e("CityViewModel", "searchCity: $e", )
+                // Stream the data using Flow
+                cityRepository.getFavCities().collect { favoriteCities ->
+                    _favCities.value = CityUiState.Success(favoriteCities)
+                    Log.d("CityViewModel", "getFavoriteCities: $favoriteCities")
+                }
+            } catch (e: Exception) {
+                Log.e("CityViewModel", "getFavoriteCities: $e")
                 _favCities.value = CityUiState.Error(e.localizedMessage)
             }
         }
     }
 
-    fun saveFavoriteCity(){
-
+    suspend fun saveFavoriteCity(
+        city: City
+    ): Long {
+        return cityRepository.saveFavCity(
+            city
+        )
     }
 
     fun clearSearchCitiesData() {
-        // Update only the `Success` state to clear the cities list
-        if (_citiesDataSearch.value is CityUiState.Success) {
-            _citiesDataSearch.value = CityUiState.Success(emptyList())  // Clear cities list
-        }
+        _citiesDataSearch.value = CityUiState.Success(emptyList())  // Clear cities list
     }
 
     init {
-        getFavoriteLocations()
+        getFavoriteCities()
     }
 }

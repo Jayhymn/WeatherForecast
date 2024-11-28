@@ -15,23 +15,23 @@ class WeatherViewModel @Inject constructor(
     private val getWeatherUseCase: GetWeatherUseCase
 ) : ViewModel() {
     private val _weatherState = MutableStateFlow<WeatherUiState>(WeatherUiState.Idle)
-    val weatherState get() = _weatherState.asStateFlow()
+    val weatherState = _weatherState.asStateFlow()
 
-    fun fetchWeatherForCity(lat: Double, lon: Double, cityName: String) {
+    fun fetchWeatherForCity(lat: Double, lon: Double) {
         viewModelScope.launch {
             _weatherState.value = WeatherUiState.Loading
             try {
-                val weatherData = getWeatherUseCase(lat, lon, cityName)
-                _weatherState.value = WeatherUiState.Success(weatherData)
+                // Stream updates from local and network sources
+                getWeatherUseCase.getWeather(lat, lon)
+                    .collect { weatherData ->
+                        _weatherState.value = WeatherUiState.Success(weatherData)
+                    }
             } catch (e: Exception) {
-                _weatherState.value = WeatherUiState.Error(e.localizedMessage)
+                _weatherState.value = WeatherUiState.Error(e.localizedMessage ?: "Unknown error")
             }
         }
     }
-
-    init {
-
-    }
 }
+
 
 

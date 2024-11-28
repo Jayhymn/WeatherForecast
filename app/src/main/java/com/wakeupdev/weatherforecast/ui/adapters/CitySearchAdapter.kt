@@ -46,7 +46,7 @@ class CitySearchAdapter(private var cities: List<City>, private val searchListen
     inner class CityViewHolder(private val binding: ItemCitySearchBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(city: City) {
-            binding.tvCityName.text = city.name
+            binding.cityName.text = "${city.name}, ${city.state}, ${city.country}"
 
             binding.root.setOnClickListener {
                 searchListener.onSearchItemClicked(city)

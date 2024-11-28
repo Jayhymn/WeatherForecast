@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.viewpager2)
 
     testImplementation(libs.testng)
     testImplementation(libs.hilt.android.testing)

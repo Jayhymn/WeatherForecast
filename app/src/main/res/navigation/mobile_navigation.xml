@@ -13,6 +13,10 @@
         <action
             android:id="@+id/action_currentFragment_to_dailyWeatherFragment"
             app:destination="@id/daily_weather_fragment" />
+        <action
+            android:id="@+id/action_currentFragment_to_favoriteCitiesFragment"
+            app:destination="@id/navigation_favorites" />
+
     </fragment>
 
     <fragment
@@ -28,9 +32,22 @@
 
     <fragment
         android:id="@+id/navigation_favorites"
-        android:name="com.wakeupdev.weatherforecast.ui.fragments.FavoriteLocationFragment"
+        android:name="com.wakeupdev.weatherforecast.ui.fragments.FavoriteCitiesFragment"
         android:label="@string/title_search"
-        tools:layout="@layout/fragment_favorite_location" />
+        tools:layout="@layout/fragment_favorite_cities" >
+        <action
+            android:id="@+id/action_weatherFragment_to_weatherDialogFragment"
+            app:destination="@id/weatherDialogFragment" />
+        <action
+            android:id="@+id/action_favoriteCitiesFragment_to_weatherFragment"
+            app:destination="@id/navigation_home" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/weatherDialogFragment"
+        android:name="com.wakeupdev.weatherforecast.ui.fragments.WeatherDialogFragment"
+        android:label="Weather Dialog"
+        tools:layout="@layout/fragment_weather" />
 
     <fragment
         android:id="@+id/navigation_profile"

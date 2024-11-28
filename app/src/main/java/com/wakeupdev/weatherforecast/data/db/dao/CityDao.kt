@@ -6,18 +6,22 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.wakeupdev.weatherforecast.data.db.entities.CityEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CityDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(city: CityEntity)
+    suspend fun insert(city: CityEntity): Long
 
     @Delete
     suspend fun delete(city: CityEntity)
 
     @Query("SELECT * FROM cities")
-    suspend fun getAllCities(): List<CityEntity>
+    fun streamFavoriteCities(): Flow<List<CityEntity>>
+
+    @Query("SELECT * FROM cities")
+    suspend fun getFavoriteCities(): List<CityEntity>
 
     @Query("SELECT * FROM cities WHERE name = :cityName LIMIT 1")
     suspend fun getCityByName(cityName: String): CityEntity?

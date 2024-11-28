@@ -5,7 +5,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.LocationRequest
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.tasks.await
@@ -17,37 +18,45 @@ class LocationHelper @Inject constructor(
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
     suspend fun getCurrentLocation(): Location? {
-        // Check if permissions are granted
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return null // Permissions are not granted
+        if (!hasLocationPermission()) {
+            return null
         }
 
-        // Try last known location first
+        // Try fetching last known location first
         val lastLocation = fusedLocationClient.lastLocation.await()
         if (lastLocation != null) {
             return lastLocation
         }
 
-        // Request fresh location if last location is null
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000L)
-            .setMaxUpdates(1) // We only need one fresh location update
-            .build()
+        return fetchFreshLocation()
+    }
 
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
+    fun requestPermissionIfNeeded(fragment: Fragment, requestCode: Int, onPermissionGranted: () -> Unit) {
+        if (!hasLocationPermission()) {
+            requestPermission(fragment, requestCode)
+        } else {
+            onPermissionGranted()
+        }
+    }
+
+
+    private fun requestPermission(fragment: Fragment, requestCode: Int) {
+        ActivityCompat.requestPermissions(
+            fragment.requireActivity(),
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            requestCode
+        )
+    }
+
+    private suspend fun fetchFreshLocation(): Location? {
         return try {
-            fusedLocationClient.getCurrentLocation(
-                Priority.PRIORITY_HIGH_ACCURACY,
-                null
-            ).await() // Await a fresh location update
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).await()
         } catch (e: Exception) {
-            null // Return null if location retrieval fails
+            null
         }
     }
 }

@@ -2,11 +2,11 @@ package com.wakeupdev.weatherforecast.data.db.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.wakeupdev.weatherforecast.data.api.City
-import com.wakeupdev.weatherforecast.data.api.GeocodeResItem
 
-@Entity(tableName = "cities")
+@Entity(tableName = "cities", indices = [Index(value = ["name"], unique = true)])
 data class CityEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,  // Auto-generated primary key
     @ColumnInfo(name = "name") val name: String,        // Name of the city
@@ -18,7 +18,7 @@ data class CityEntity(
 
 fun CityEntity.toCityData(): City {
     return City(
-        name = name,
+        name = "$name,$state, $country",
         state = state,
         country = country,
         latitude = latitude,

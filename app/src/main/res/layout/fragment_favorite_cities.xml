@@ -5,11 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.FavoriteLocationFragment">
+    tools:context=".ui.fragments.FavoriteCitiesFragment">
 
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/main_content"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -59,15 +60,34 @@
             app:layout_anchor="@+id/linearLayout"
             app:layout_anchorGravity="center">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_search_results"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="visible"
-                android:padding="8dp" />
             <include
                 android:id="@+id/fav_location"
                 layout="@layout/fav_location_bottom_sheet" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_search_results"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:background="@drawable/bg_appbar"
+                    android:padding="8dp" />
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|top"
+                    android:layout_marginTop="10dp"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    />
+
+            </FrameLayout>
+
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

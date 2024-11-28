@@ -28,7 +28,7 @@ data class WeatherEntity(
     val longitude: Double
 )
 
-fun WeatherEntity.toDomainModel(): WeatherData {
+fun WeatherEntity.toWeatherData(): WeatherData {
     return WeatherData(
         cityName = this.cityName,
         currentTemperature = this.currentTemperature,

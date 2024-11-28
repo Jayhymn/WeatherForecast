@@ -5,16 +5,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.wakeupdev.weatherforecast.data.api.City
-import com.wakeupdev.weatherforecast.databinding.ItemCitySearchBinding
+import com.wakeupdev.weatherforecast.databinding.ItemFavoriteCityBinding
 
 
-class FavoriteLocationAdapter(
+class FavoriteCitiesAdapter(
     private var cities: List<City>,
-    private val listener: CityItemListener? = null
-) : RecyclerView.Adapter<FavoriteLocationAdapter.FavoriteCityHolder>() {
+    private val listener: FavoriteCityListener? = null
+) : RecyclerView.Adapter<FavoriteCitiesAdapter.FavoriteCityHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteCityHolder {
-        val binding = ItemCitySearchBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemFavoriteCityBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return FavoriteCityHolder(binding)
     }
 
@@ -39,22 +39,22 @@ class FavoriteLocationAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
-    interface CityItemListener {
-        fun onItemClick(city: City)
+    interface FavoriteCityListener {
+        fun onFavoriteCityItemClick(city: City)
     }
 
     override fun getItemCount() = cities.size
 
-    inner class FavoriteCityHolder(private val binding: ItemCitySearchBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class FavoriteCityHolder(private val binding: ItemFavoriteCityBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(city: City) {
             binding.tvCityName.text = city.name
             binding.root.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    listener?.onItemClick(cities[position])
+                    listener?.onFavoriteCityItemClick(cities[position])
                 }
             }
-            binding.root.contentDescription = "City name: ${city.name}"
+//            binding.root.contentDescription = "City name: ${city.name}"
         }
     }
 }

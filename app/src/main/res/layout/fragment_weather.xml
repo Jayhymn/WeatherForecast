@@ -1,193 +1,246 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
-    <LinearLayout
+    xmlns:tools="http://schemas.android.com/tools">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:padding="10dp"
-        android:layout_weight="0.6"
-        android:layout_margin="8dp"
-        android:background="@drawable/clear_sky"
+        android:layout_height="match_parent"
         android:orientation="vertical">
-        <RelativeLayout
-            android:id="@+id/rlFavorite"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible"
-            >
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:text="Cancel"
-                android:textSize="18sp"
-                android:textColor="#f4f4f4"
-                android:layout_alignParentStart="true"
-                />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:text="Add"
-                android:textSize="18sp"
-                android:textColor="#f4f4f4"
-                android:layout_alignParentEnd="true"
-                />
-
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            >
-            <TextView
-                android:id="@+id/tvCityName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:drawableStartCompat="@drawable/ic_location"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:textSize="16sp"
-                tools:text="Gotham" />
-            <TextView
-                android:id="@+id/tvTodayTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Today 00:32 PM"
-                android:layout_alignParentEnd="true"
-                android:textSize="16sp"
-                />
-        </RelativeLayout>
-        <TextView
-            android:id="@+id/tvCurrentTemperature"
-            android:layout_marginTop="15dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="25"
-            android:layout_gravity="center"
-            android:textSize="55sp"
-            />
-        <TextView
-            android:id="@+id/tvWeatherCondition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Monthly Clear"
-            android:layout_gravity="center"
-            />
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
-            <TextView
-                android:id="@+id/tvMinTemp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="L: 24°C"
-                />
-            <View
-                android:layout_width="20dp"
-                android:layout_height="1dp"/>
-            <TextView
-                android:id="@+id/tvMaxTemp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="H: 34°C"
-                />
-        </LinearLayout>
-        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            >
-            <TextView
-                android:id="@+id/tvPressure"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:layout_alignParentStart="true"
-                tools:text=" 720hpa"
-                android:drawableStart="@drawable/ic_pressure"
-                />
-            <TextView
-                android:id="@+id/tvHumidity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="  32%"
-                android:drawableStart="@drawable/ic_humidity"
-                android:layout_centerInParent="true"
-                />
-
-            <TextView
-                android:id="@+id/tvWindSpeed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:drawableStart="@drawable/ic_wind"
-                tools:text="  12km/h" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:background="@drawable/background_2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_marginHorizontal="5dp"
-            >
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/temperatureChart"
+            android:layout_height="0dp"
+            android:padding="10dp"
+            android:layout_weight="0.6"
+            android:background="@drawable/clear_sky"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:id="@+id/rlFavorite"
                 android:layout_width="match_parent"
-                android:layout_alignParentBottom="true"
-                android:layout_height="match_parent" />
-        </RelativeLayout>
-    </LinearLayout>
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible"
+                >
+                <Button
+                    android:id="@+id/tvCancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:text="Cancel"
+                    android:textSize="18sp"
+                    android:textColor="#f4f4f4"
+                    android:layout_alignParentStart="true"
+                    />
+                <Button
+                    android:id="@+id/tvAddFav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:text="Add"
+                    android:textSize="18sp"
+                    android:textColor="#f4f4f4"
+                    android:layout_alignParentEnd="true"
+                    />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.28"
-        android:orientation="vertical">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp">
-
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                >
+                <TextView
+                    android:id="@+id/tvCityName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:drawableStartCompat="@drawable/ic_location"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:textSize="16sp"
+                    tools:text="Gotham" />
+                <TextView
+                    android:id="@+id/tvTodayTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="Today 00:32 PM"
+                    android:layout_alignParentEnd="true"
+                    android:textSize="16sp"
+                    />
+            </RelativeLayout>
             <TextView
+                android:id="@+id/tvCurrentTemperature"
+                android:layout_marginTop="15dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:padding="10dp"
-                android:text="Today"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/btnNext7days"
-                style="@style/Widget.Material3.Button.TextButton"
+                tools:text="25"
+                android:layout_gravity="center"
+                android:textSize="55sp"
+                />
+            <TextView
+                android:id="@+id/tvWeatherCondition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:padding="10dp"
-                android:textStyle="bold"
-                android:linksClickable="true"
-                android:text="@string/next_7_days"
-                android:enabled="false"
-                android:drawableEnd="@drawable/ic_open"
-                 />
-        </RelativeLayout>
+                android:text="Monthly Clear"
+                android:layout_gravity="center"
+                />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+                <TextView
+                    android:id="@+id/tvMinTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="L: 24°C"
+                    />
+                <View
+                    android:layout_width="20dp"
+                    android:layout_height="1dp"/>
+                <TextView
+                    android:id="@+id/tvMaxTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="H: 34°C"
+                    />
+            </LinearLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                >
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Atm Pressure"
+                        />
+                    <TextView
+                        android:id="@+id/tvPressure"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        tools:text=" 720hpa"
+                        android:drawableStart="@drawable/ic_pressure"
+                        />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvHourlyForecast"
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:orientation="vertical"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Himidity"
+                        />
+                    <TextView
+                        android:id="@+id/tvHumidity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="  32%"
+                        android:drawableStart="@drawable/ic_humidity"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Wind Speed"
+                        />
+                    <TextView
+                        android:id="@+id/tvWindSpeed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_wind"
+                        tools:text="  12km/h" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:background="@drawable/background_2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="5dp"
+                >
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/temperatureChart"
+                    android:layout_width="match_parent"
+                    android:layout_alignParentBottom="true"
+                    android:layout_height="match_parent" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="none"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:orientation="horizontal"
-            tools:listitem="@layout/hourly_item_forecast" />
+            android:layout_height="0dp"
+            android:layout_weight="0.28"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:padding="10dp"
+                    android:text="Today"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnNext7days"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:padding="10dp"
+                    android:textStyle="bold"
+                    android:linksClickable="true"
+                    android:text="@string/next_7_days"
+                    android:enabled="false"
+                    android:drawableEnd="@drawable/ic_open"
+                    />
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvHourlyForecast"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:orientation="horizontal"
+                tools:listitem="@layout/hourly_item_forecast" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+    <ImageButton
+        android:id="@+id/imgFavCities"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/ic_favorite"
+        android:padding="15dp"
+        android:scaleType="fitCenter"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="40dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/round_white_background"
+        app:tint="#ffffff" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
