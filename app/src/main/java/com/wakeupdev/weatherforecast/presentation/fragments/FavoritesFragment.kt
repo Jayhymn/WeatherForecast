@@ -52,9 +52,9 @@ class FavoritesFragment : Fragment(R.layout.fragment_favorites){
             }
         })
 
-        binding.imgClose.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
+//        binding.imgClose.setOnClickListener {
+//            parentFragmentManager.popBackStack()
+//        }
     }
 
     private fun observeUiState(){
