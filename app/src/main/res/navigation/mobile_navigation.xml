@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.wakeupdev.weatherforecast.features.weather.presentation.WeatherFragment"
+        android:name="com.wakeupdev.weatherforecast.ui.fragments.WeatherFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_weather" >
         <action
@@ -17,30 +17,30 @@
 
     <fragment
         android:id="@+id/daily_weather_fragment"
-        android:name="com.wakeupdev.weatherforecast.features.weather.presentation.DailyWeatherFragment"
+        android:name="com.wakeupdev.weatherforecast.ui.fragments.DailyWeatherFragment"
         android:label="@string/title_daily"
         tools:layout="@layout/fragment_daily_weather">
         <argument
             android:name="weatherData"
-            app:argType="com.wakeupdev.weatherforecast.features.weather.data.WeatherData" />
+            app:argType="com.wakeupdev.weatherforecast.data.WeatherData" />
     </fragment>
 
 
 <!--    <fragment-->
 <!--        android:id="@+id/navigation_search"-->
-<!--        android:name="com.wakeupdev.weatherforecast.features.searchcity.SearchFragment"-->
+<!--        android:name="com.wakeupdev.weatherforecast.ui.fragment.SearchFragment"-->
 <!--        android:label="@string/title_search"-->
 <!--        tools:layout="@layout/fragment_search" />-->
 
     <fragment
         android:id="@+id/navigation_favorites"
-        android:name="com.wakeupdev.weatherforecast.features.searchcity.FavoritesFragment"
+        android:name="com.wakeupdev.weatherforecast.ui.fragments.FavoritesFragment"
         android:label="@string/title_favorites"
         tools:layout="@layout/fragment_favorites" />
 
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="com.wakeupdev.weatherforecast.features.searchcity.ProfileFragment"
+        android:name="com.wakeupdev.weatherforecast.ui.fragments.ProfileFragment"
         android:label="@string/title_favorites"
         tools:layout="@layout/fragment_profile" />
 

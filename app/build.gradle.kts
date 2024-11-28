@@ -28,7 +28,15 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         val apiKey = localProperties["API_KEY"] as String? ?: ""
+        val mapKey = localProperties["GOOGLE_MAPS_API_KEY"] as String? ?: ""
+
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
+
+        manifestPlaceholders.putAll(
+            mapOf(
+                "GOOGLE_MAPS_API_KEY" to mapKey
+            )
+        )
     }
 
     buildTypes {
