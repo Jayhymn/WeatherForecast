@@ -18,18 +18,34 @@ class CityViewModel @Inject constructor(
     private val cityRepository: CityRepository,
 ) : ViewModel() {
 
-    private val _citiesData = MutableStateFlow<CityUiState>(CityUiState.Idle)
-    val citiesData get() = _citiesData.asStateFlow()
+    private val _favCities = MutableStateFlow<CityUiState>(CityUiState.Idle)
+    val favCities get() = _favCities.asStateFlow()
+
+    private val _citiesDataSearch = MutableStateFlow<CityUiState>(CityUiState.Idle)
+    val citiesSearch get() = _citiesDataSearch.asStateFlow()
 
     fun searchCity(searchQuery: String) {
         viewModelScope.launch {
-            _citiesData.value = CityUiState.Loading
+            _citiesDataSearch.value = CityUiState.Loading
             try {
                 val citiesData = cityRepository.searchCity(searchQuery)
-                _citiesData.value = CityUiState.Success(citiesData)
+                _citiesDataSearch.value = CityUiState.Success(citiesData)
             } catch (e: Exception) {
                 Log.e("CityViewModel", "searchCity: $e", )
-                _citiesData.value = CityUiState.Error(e.localizedMessage)
+                _citiesDataSearch.value = CityUiState.Error(e.localizedMessage)
+            }
+        }
+    }
+
+    private fun getFavoriteLocations(){
+        viewModelScope.launch {
+            _favCities.value = CityUiState.Loading
+            try {
+                val favoriteCities = cityRepository.getFavLocations()
+                _favCities.value = CityUiState.Success(favoriteCities)
+            } catch (e: Exception){
+                Log.e("CityViewModel", "searchCity: $e", )
+                _favCities.value = CityUiState.Error(e.localizedMessage)
             }
         }
     }
@@ -38,11 +54,14 @@ class CityViewModel @Inject constructor(
 
     }
 
-    fun clearCitiesData() {
+    fun clearSearchCitiesData() {
         // Update only the `Success` state to clear the cities list
-        if (_citiesData.value is CityUiState.Success) {
-            _citiesData.value = CityUiState.Success(emptyList())  // Clear cities list
+        if (_citiesDataSearch.value is CityUiState.Success) {
+            _citiesDataSearch.value = CityUiState.Success(emptyList())  // Clear cities list
         }
     }
 
+    init {
+        getFavoriteLocations()
+    }
 }

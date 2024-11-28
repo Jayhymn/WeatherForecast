@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp"
-        android:layout_margin="8dp"
         app:defaultNavHost="true"
         android:name="androidx.navigation.fragment.NavHostFragment"
         app:layout_constraintBottom_toTopOf="@id/divider"

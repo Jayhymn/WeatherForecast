@@ -4,20 +4,22 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.wakeupdev.weatherforecast.databinding.ItemCitySearchBinding
 import com.wakeupdev.weatherforecast.data.api.City
+import com.wakeupdev.weatherforecast.databinding.ItemCitySearchBinding
 
-class CitySearchAdapter(private var cities: List<City>, private val searchListener: SearchResultListener) :
-    RecyclerView.Adapter<CitySearchAdapter.CityViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityViewHolder {
+class FavoriteLocationAdapter(
+    private var cities: List<City>,
+    private val listener: CityItemListener? = null
+) : RecyclerView.Adapter<FavoriteLocationAdapter.FavoriteCityHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteCityHolder {
         val binding = ItemCitySearchBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return CityViewHolder(binding)
+        return FavoriteCityHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: CityViewHolder, position: Int) {
-        val city = cities[position]
-        holder.bind(city)
+    override fun onBindViewHolder(holder: FavoriteCityHolder, position: Int) {
+        holder.bind(cities[position])
     }
 
     fun updateCities(newCities: List<City>) {
@@ -37,21 +39,22 @@ class CitySearchAdapter(private var cities: List<City>, private val searchListen
         diffResult.dispatchUpdatesTo(this)
     }
 
-    interface SearchResultListener {
-        fun onSearchItemClicked(city: City)
+    interface CityItemListener {
+        fun onItemClick(city: City)
     }
 
     override fun getItemCount() = cities.size
 
-    inner class CityViewHolder(private val binding: ItemCitySearchBinding) : RecyclerView.ViewHolder(binding.root) {
-
+    inner class FavoriteCityHolder(private val binding: ItemCitySearchBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(city: City) {
             binding.tvCityName.text = city.name
-
             binding.root.setOnClickListener {
-                searchListener.onSearchItemClicked(city)
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    listener?.onItemClick(cities[position])
+                }
             }
+            binding.root.contentDescription = "City name: ${city.name}"
         }
     }
 }
-

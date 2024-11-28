@@ -5,6 +5,7 @@ import com.wakeupdev.weatherforecast.data.api.GeocodingApiService
 import com.wakeupdev.weatherforecast.data.api.toCityData
 import com.wakeupdev.weatherforecast.data.db.dao.CityDao
 import com.wakeupdev.weatherforecast.data.db.dao.WeatherDao
+import com.wakeupdev.weatherforecast.data.db.entities.toCityData
 import javax.inject.Inject
 
 class CityRepository @Inject constructor(
@@ -14,6 +15,12 @@ class CityRepository @Inject constructor(
 ) {
     suspend fun searchCity(searchQuery: String): List<City> {
         val cities = apiService.getGeocodes(searchQuery)
+
+        return cities.map { it.toCityData() }
+    }
+
+    suspend fun getFavLocations(): List<City> {
+        val cities = cityDao.getAllCities()
 
         return cities.map { it.toCityData() }
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="app_bar_color">#bad9f5</color>
+    <color name="app_bar_color">#FBFBFB</color>
     <color name="primaryLight">#dee8f3</color>
     <color name="primary">#28659b</color>
     <color name="transparent">#00000000</color>
@@ -29,5 +29,6 @@
     <color name="bg_screen_color">#BBDEFB</color>
     <color name="in_progress_color">#80C9A3</color>
     <color name="input_border_color">#80C9A3</color>
+    <color name="color_default_background_grey">#F4F4F4</color>
 </resources>
 

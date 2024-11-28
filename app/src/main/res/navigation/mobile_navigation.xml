@@ -26,17 +26,11 @@
     </fragment>
 
 
-<!--    <fragment-->
-<!--        android:id="@+id/navigation_search"-->
-<!--        android:name="com.wakeupdev.weatherforecast.ui.fragment.SearchFragment"-->
-<!--        android:label="@string/title_search"-->
-<!--        tools:layout="@layout/fragment_search" />-->
-
     <fragment
         android:id="@+id/navigation_favorites"
-        android:name="com.wakeupdev.weatherforecast.ui.fragments.FavoritesFragment"
-        android:label="@string/title_favorites"
-        tools:layout="@layout/fragment_favorites" />
+        android:name="com.wakeupdev.weatherforecast.ui.fragments.FavoriteLocationFragment"
+        android:label="@string/title_search"
+        tools:layout="@layout/fragment_favorite_location" />
 
     <fragment
         android:id="@+id/navigation_profile"

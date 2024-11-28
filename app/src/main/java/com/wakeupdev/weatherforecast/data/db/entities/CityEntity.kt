@@ -3,6 +3,8 @@ package com.wakeupdev.weatherforecast.data.db.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.wakeupdev.weatherforecast.data.api.City
+import com.wakeupdev.weatherforecast.data.api.GeocodeResItem
 
 @Entity(tableName = "cities")
 data class CityEntity(
@@ -13,3 +15,13 @@ data class CityEntity(
     @ColumnInfo(name = "latitude") val latitude: Double, // Latitude of the city
     @ColumnInfo(name = "longitude") val longitude: Double // Longitude of the city
 )
+
+fun CityEntity.toCityData(): City {
+    return City(
+        name = name,
+        state = state,
+        country = country,
+        latitude = latitude,
+        longitude = longitude
+    )
+}

@@ -8,4 +8,18 @@
     </style>
 
     <style name="Theme.WeatherForecast" parent="Base.Theme.WeatherForecast" />
+
+    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+<!--        <item name="android:fontFamily">@font/dm_sans_medium</item>-->
+        <item name="colorPrimary">#6E8AC0</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimaryDark">#597181</item>
+        <item name="colorAccent">#b4ffdf</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textSize">16sp</item>
+
+    </style>
+
 </resources>
