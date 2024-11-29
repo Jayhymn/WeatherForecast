@@ -12,6 +12,7 @@ data class GeocodeResItem(
 
 fun GeocodeResItem.toCityData(): City {
     return City(
+        id = 0,
         name = name ?: "",
         state = state ?: "",
         country = country ?: "",

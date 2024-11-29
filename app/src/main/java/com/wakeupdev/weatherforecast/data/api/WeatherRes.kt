@@ -44,6 +44,7 @@ fun WeatherResponse.toWeatherData(): WeatherData {
 fun WeatherResponse.toWeatherEntity(): WeatherEntity {
     return WeatherEntity(
         cityName = this.timezone,
+        cityId = 0,
         currentTemperature = this.current.temp ?: 0.0,
         weatherCondition = this.current.weather.getOrNull(0)?.main ?: "Unknown", // Safe call and fallback value
         weatherIcon = this.current.weather.getOrNull(0)?.icon ?: "", // Safe call and fallback value

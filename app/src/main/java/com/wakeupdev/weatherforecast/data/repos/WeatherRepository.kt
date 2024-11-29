@@ -17,8 +17,12 @@ class WeatherRepository @Inject constructor(
     private val weatherDao: WeatherDao,
     private val cityDao: CityDao,
 ) {
-    fun getWeatherFromDatabase(): Flow<WeatherEntity?> {
-        return weatherDao.fetchWeatherData()
+    fun getCurrentWeather(): Flow<WeatherEntity?> {
+        return weatherDao.getCurrentWeather()
+    }
+
+    fun getFavoriteWeather(cityName: String): Flow<WeatherEntity?> {
+        return weatherDao.getFavoriteWeather(cityName)
     }
 
     suspend fun getWeatherFromApi(lat: Double, lon: Double): WeatherData {
@@ -26,9 +30,6 @@ class WeatherRepository @Inject constructor(
             // Fetch from API
             val response = apiService.getWeather(lat, lon)
             val weatherData = response.toWeatherData()
-
-            // Cache the result
-            weatherDao.insertWeatherData(weatherData.toEntity())
 
             weatherData
         } catch (e: Exception) {
@@ -47,11 +48,26 @@ class WeatherRepository @Inject constructor(
             val weatherEntity = weather.toWeatherEntity()
 
             // update / save to database
-            weatherDao.updateWeatherData(weatherEntity)
+            weatherDao.updateWeatherData(weatherEntity.copy(id = city.id))
         }
     }
 
-    suspend fun cacheWeatherData(weatherData: WeatherData) {
-        weatherDao.insertWeatherData(weatherData.toEntity())
+//    suspend fun cacheWeatherData(weatherData: WeatherData, isCurrentCity: Boolean) {
+//        val weatherEntity = weatherData.toEntity().copy(currentLocation = isCurrentCity)
+//        weatherDao.insertWeatherData(weatherEntity)
+//    }
+
+    suspend fun cacheWeatherData(weatherData: WeatherData, isCurrentCity: Boolean) {
+        val existingData = if (isCurrentCity) {
+            weatherDao.getWeatherDataForCurrentLocation() // Get weather data for current location
+        } else {
+            weatherDao.getWeatherDataByCityName(weatherData.cityName ?: "") // Get weather data by city name
+        }
+
+        if (existingData != null) {
+            weatherDao.updateWeatherData(weatherData.toEntity().copy(currentLocation = isCurrentCity))
+        } else {
+            weatherDao.insertWeatherData(weatherData.toEntity().copy(currentLocation = isCurrentCity))
+        }
     }
 }

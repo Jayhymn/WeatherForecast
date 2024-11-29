@@ -3,13 +3,14 @@ package com.wakeupdev.weatherforecast
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.wakeupdev.weatherforecast.data.api.City
 import kotlinx.coroutines.tasks.await
+import java.util.Locale
 import javax.inject.Inject
 
 class LocationHelper @Inject constructor(
@@ -35,22 +36,21 @@ class LocationHelper @Inject constructor(
         return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun requestPermissionIfNeeded(fragment: Fragment, requestCode: Int, onPermissionGranted: () -> Unit) {
-        if (!hasLocationPermission()) {
-            requestPermission(fragment, requestCode)
-        } else {
-            onPermissionGranted()
-        }
-    }
+    fun reverseGeoCode(lat:Double, lon: Double): City {
+        val geocoder = Geocoder(context, Locale.getDefault())
+        val addressList = geocoder.getFromLocation(lat, lon, 1)
 
+        val address = addressList?.get(0)
 
-    private fun requestPermission(fragment: Fragment, requestCode: Int) {
-        ActivityCompat.requestPermissions(
-            fragment.requireActivity(),
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            requestCode
+        return City(
+            id = 0,
+            name = address?.locality ?: "",
+            country = address?.countryName ?: "",
+            longitude = lon,
+            latitude = lat
         )
     }
+
 
     private suspend fun fetchFreshLocation(): Location? {
         return try {

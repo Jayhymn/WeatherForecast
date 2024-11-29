@@ -3,6 +3,7 @@ package com.wakeupdev.weatherforecast.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.wakeupdev.weatherforecast.data.WeatherData
 import com.wakeupdev.weatherforecast.data.api.City
 import com.wakeupdev.weatherforecast.data.repos.CityRepository
 import com.wakeupdev.weatherforecast.data.api.GeocodingApiService
@@ -55,15 +56,24 @@ class CityViewModel @Inject constructor(
     }
 
     suspend fun saveFavoriteCity(
-        city: City
+        city: City,
+        weatherDataList: WeatherData
     ): Long {
-        return cityRepository.saveFavCity(
-            city
-        )
+        return cityRepository.saveFavCity(city, weatherDataList)
     }
 
     fun clearSearchCitiesData() {
         _citiesDataSearch.value = CityUiState.Success(emptyList())  // Clear cities list
+    }
+
+    fun deleteCities(cities: List<City>) {
+        viewModelScope.launch {
+            cityRepository.deleteCities(cities)
+        }
+    }
+
+    fun saveFavoriteCity(city: City) {
+
     }
 
     init {

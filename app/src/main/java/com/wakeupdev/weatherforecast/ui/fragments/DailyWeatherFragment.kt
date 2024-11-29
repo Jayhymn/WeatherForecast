@@ -22,13 +22,15 @@ class DailyWeatherFragment : Fragment(R.layout.fragment_daily_weather) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentDailyWeatherBinding.bind(view)
 
-        val args: DailyWeatherFragmentArgs by navArgs()
-        weatherData = args.weatherData
+
+        arguments?.let {
+            weatherData = it.getParcelable("weatherData") ?: throw IllegalArgumentException("Data not found")
+        }
 
         binding.tvCityName.text = weatherData.cityName
 
         binding.imgNavBack.setOnClickListener {
-            findNavController().popBackStack()
+            parentFragmentManager.popBackStack()
         }
 
         // Set up RecyclerViews

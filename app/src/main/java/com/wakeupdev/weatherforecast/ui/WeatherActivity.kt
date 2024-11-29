@@ -8,10 +8,13 @@ import android.view.animation.AnticipateInterpolator
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
+import androidx.fragment.app.commit
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.wakeupdev.weatherforecast.R
 import com.wakeupdev.weatherforecast.databinding.ActivityWeatherBinding
+import com.wakeupdev.weatherforecast.ui.fragments.FavoriteCitiesFragment
+import com.wakeupdev.weatherforecast.ui.fragments.WeatherFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -28,8 +31,12 @@ class WeatherActivity : AppCompatActivity() {
         binding = ActivityWeatherBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Set up the navigation
-        setupNavigation()
+        supportFragmentManager.commit {
+            val weatherFragment = WeatherFragment()
+
+            replace(R.id.fragmentContainer, weatherFragment)
+            addToBackStack(null)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -50,10 +57,5 @@ class WeatherActivity : AppCompatActivity() {
                 slideLeft.start()
             }, 1500) // Reduced delay to 1.5 seconds for better UX
         }
-    }
-
-    private fun setupNavigation() {
-        val navController = findNavController(R.id.fragmentContainer)
-        binding.bottomNavigation.setupWithNavController(navController)
     }
 }

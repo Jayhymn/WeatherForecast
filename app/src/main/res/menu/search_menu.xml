@@ -9,4 +9,13 @@
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         />
+    <item
+        android:id="@+id/delete"
+        android:title=""
+        android:icon="@drawable/ic_delete"
+        android:iconTint="#ff0000"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        />
+
 </menu>

@@ -1,5 +1,6 @@
 package com.wakeupdev.weatherforecast.ui.fragments
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
@@ -7,12 +8,14 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.charts.LineChart
 import com.wakeupdev.weatherforecast.Constants
@@ -30,6 +33,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
 @AndroidEntryPoint
 class WeatherFragment : Fragment(R.layout.fragment_weather) {
     private lateinit var binding: FragmentWeatherBinding
@@ -39,6 +43,22 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var timeRunnable: Runnable
     private lateinit var weatherDataList: WeatherData
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
+    private var citName: String = ""
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            Log.d("WeatherFragment", "Permissions granted. Fetching weather...")
+            fetchWeatherForCurrentLocation()
+        } else {
+            showPermissionDeniedMessage()
+        }
+    }
+
+    companion object {
+
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,14 +66,35 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
         locationHelper = LocationHelper(requireContext())
         lineChart = binding.temperatureChart
 
-        binding.btnNext7days.setOnClickListener {
-            val action = WeatherFragmentDirections.actionCurrentFragmentToDailyWeatherFragment(weatherDataList)
-            findNavController().navigate(action)
+        arguments?.let {
+            Log.d("WeatherFragment", "onViewCreated: $arguments")
+            latitude = it.getDouble("lat", 0.0)
+            longitude = it.getDouble("lon", 0.0)
+            citName = it.getString("city_name", "")
         }
 
+
+        binding.btnNext7days.setOnClickListener {
+            val dailyWeatherFragment = DailyWeatherFragment()
+            val bundle = Bundle()
+            bundle.putParcelable("weatherData", weatherDataList)
+
+            dailyWeatherFragment.arguments = bundle
+
+            parentFragmentManager.commit {
+                replace(R.id.fragmentContainer, dailyWeatherFragment)
+                addToBackStack(null)
+            }
+        }
+
+
         binding.imgFavCities.setOnClickListener {
-            val action = WeatherFragmentDirections.actionCurrentFragmentToFavoriteCitiesFragment()
-            findNavController().navigate(action)
+            val favoriteCitiesFragment = FavoriteCitiesFragment()
+
+            parentFragmentManager.commit {
+                replace(R.id.fragmentContainer, favoriteCitiesFragment)
+                addToBackStack(null)
+            }
         }
 
         val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
@@ -66,10 +107,10 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
         }
         handler.post(timeRunnable)
 
-        Log.d("WeatherFragment", "Requesting permissions if needed...")
-        locationHelper.requestPermissionIfNeeded(this, Constants.LOCATION_PERMISSION_REQUEST_CODE) {
-            Log.d("WeatherFragment", "Permissions granted. Fetching weather...")
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fetchWeatherForCurrentLocation()
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
         observeUiState()
@@ -78,18 +119,22 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
 
     private fun fetchWeatherForCurrentLocation() {
         lifecycleScope.launch {
-            val location = locationHelper.getCurrentLocation()
+            // If latitude and longitude are available (either passed or fallback), fetch weather
+            if (latitude != 0.0 && longitude != 0.0 && citName.isNotEmpty()) {
+                weatherViewModel.fetchWeatherForCity(latitude, longitude, citName, false)
+            } else {
+                // Otherwise, get the current location
+                val location = locationHelper.getCurrentLocation()
 
-            Log.d("WeatherActivity", "Location: $location")
+                if (location != null) {
+                    val lat = location.latitude
+                    val lon = location.longitude
 
-            location?.let {
-                val lat = it.latitude
-                val lon = it.longitude
-
-                weatherViewModel.fetchWeatherForCity(lat, lon)
-            } ?: run {
-                // Handle case when location is not available
-                showPermissionDeniedMessage()
+                    weatherViewModel.fetchWeatherForCity(lat, lon, "")
+                } else {
+                    // Handle case when location is not available
+                    showPermissionDeniedMessage() // You can show a dialog or toast here to prompt the user for location permissions
+                }
             }
         }
     }

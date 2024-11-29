@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CityDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(city: CityEntity): Long
 
     @Delete
@@ -25,4 +25,7 @@ interface CityDao {
 
     @Query("SELECT * FROM cities WHERE name = :cityName LIMIT 1")
     suspend fun getCityByName(cityName: String): CityEntity?
+
+    @Query("DELETE FROM cities WHERE id IN (:id)")
+    suspend fun deleteCities(id: List<Long>)
 }

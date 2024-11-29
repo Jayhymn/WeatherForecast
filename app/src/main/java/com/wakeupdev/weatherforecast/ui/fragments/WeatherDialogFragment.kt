@@ -54,7 +54,7 @@ class WeatherDialogFragment : DialogFragment(R.layout.fragment_weather) {
     private lateinit var lineChart: LineChart
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var timeRunnable: Runnable
-    private lateinit var weatherDataList: WeatherData
+    private var weatherDataList: WeatherData? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -72,21 +72,19 @@ class WeatherDialogFragment : DialogFragment(R.layout.fragment_weather) {
         Log.d("WeatherDialogFragment", "onViewCreated: $arguments")
 
         // Show weather data for the passed location
-        fetchWeatherForCity(lat, lon, cityName)
+        fetchWeatherForCity(lat, lon)
 
         binding.rlFavorite.visibility = View.VISIBLE
+        binding.imgFavCities.visibility = View.GONE
 
         binding.tvCancel.setOnClickListener { dismiss() }
 
         binding.tvAddFav.setOnClickListener {
             lifecycleScope.launch {
-                if (city != null) {
-                    if (cityViewModel.saveFavoriteCity(
-                            city
-                        ) > 0){
-                        Toast.makeText(requireContext(), "successfully added to favorites", Toast.LENGTH_SHORT).show()
-                        dismiss()
-                    }
+                if (city != null && weatherDataList != null) {
+                    cityViewModel.saveFavoriteCity(city, weatherDataList!!)
+                    Toast.makeText(requireContext(), "successfully added to favorites", Toast.LENGTH_SHORT).show()
+                    dismiss()
                 }
             }
         }
@@ -114,8 +112,8 @@ class WeatherDialogFragment : DialogFragment(R.layout.fragment_weather) {
         observeUiState()
     }
 
-    private fun fetchWeatherForCity(lat: Double, lon: Double, cityName: String) {
-        weatherViewModel.fetchWeatherForCity(lat, lon)
+    private fun fetchWeatherForCity(lat: Double, lon: Double) {
+        weatherViewModel.fetchFavWeather(lat, lon)
     }
 
     private fun observeUiState() {

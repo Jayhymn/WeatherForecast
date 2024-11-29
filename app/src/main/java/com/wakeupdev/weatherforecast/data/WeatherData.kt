@@ -28,6 +28,7 @@ data class WeatherData(
 fun WeatherData.toEntity(): WeatherEntity {
     return WeatherEntity(
         cityName = this.cityName ?: "",
+        cityId = 0,
         currentTemperature = this.currentTemperature ?: 0.0,
         weatherCondition = this.weatherCondition ?: "",
         minTemperature = this.minTemperature ?: 0.0,

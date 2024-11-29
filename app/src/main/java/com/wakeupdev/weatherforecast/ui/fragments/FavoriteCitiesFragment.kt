@@ -1,10 +1,12 @@
 package com.wakeupdev.weatherforecast.ui.fragments
 
+import FavoriteCitiesAdapter
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -12,12 +14,14 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -42,7 +46,6 @@ import com.wakeupdev.weatherforecast.data.api.City
 import com.wakeupdev.weatherforecast.databinding.FragmentFavoriteCitiesBinding
 import com.wakeupdev.weatherforecast.ui.CityUiState
 import com.wakeupdev.weatherforecast.ui.adapters.CitySearchAdapter
-import com.wakeupdev.weatherforecast.ui.adapters.FavoriteCitiesAdapter
 import com.wakeupdev.weatherforecast.ui.viewmodels.CityViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
@@ -93,10 +96,15 @@ class FavoriteCitiesFragment : Fragment(R.layout.fragment_favorite_cities),
         setUpMenu()
     }
 
+    private var currentMenu: Menu? = null
+
     private fun setUpMenu() {
         val menuHost: MenuHost = requireActivity()
+
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                currentMenu = menu // Store the reference to the menu
+
                 menuInflater.inflate(R.menu.search_menu, menu)
 
                 val searchMenuItem = menu.findItem(R.id.search)
@@ -112,20 +120,39 @@ class FavoriteCitiesFragment : Fragment(R.layout.fragment_favorite_cities),
 
                     override fun onQueryTextChange(newText: String?): Boolean {
                         // Optional: Handle text changes
-                        if (newText?.isEmpty() == true){
+                        if (newText?.isEmpty() == true) {
                             cityViewModel.clearSearchCitiesData()
                         }
                         return true
                     }
                 })
+
+                val deleteMenuItem = menu.findItem(R.id.delete)
+                deleteMenuItem.setOnMenuItemClickListener {
+                    handleDeleteButton()
+                    true
+                }
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                if (menuItem.itemId == android.R.id.home) {
-                    handleBackButton()
-                    return true
+                when (menuItem.itemId) {
+                    android.R.id.home -> {
+                        handleBackButton()
+
+                        // Show the delete item when home button is pressed
+                        currentMenu?.findItem(R.id.delete)?.isVisible = true
+
+                        return true
+                    }
+                    R.id.search -> {
+                        // Hide the delete item when search button is pressed
+                        currentMenu?.findItem(R.id.delete)?.isVisible = false
+
+                        return true
+                    }
+
+                    else -> return false
                 }
-                return false
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
@@ -282,9 +309,54 @@ class FavoriteCitiesFragment : Fragment(R.layout.fragment_favorite_cities),
         }
     }
 
+    private fun showDeleteConfirmationDialog(selectedCities: List<City>) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Delete Selected Cities")
+        builder.setMessage("Are you sure you want to delete ${selectedCities.size} selected cities?")
+        builder.setPositiveButton("Yes") { _, _ ->
+            // Delete selected cities
+            deleteSelectedCities(selectedCities)
+        }
+        builder.setNegativeButton("No", null)
+        builder.show()
+    }
+
+    private fun handleDeleteButton() {
+        val selectedCities = favoriteLocationAdapter.getSelectedCities()
+
+        Log.d("FavoriteCitiesFragment", "handleDeleteButton: $selectedCities")
+        if (selectedCities.isEmpty()) {
+            // Show Snackbar if no cities are selected
+            Snackbar.make(requireView(), "No selections made", Snackbar.LENGTH_SHORT).show()
+        } else {
+            // Show confirmation dialog if cities are selected
+            showDeleteConfirmationDialog(selectedCities)
+        }
+    }
+
+    private fun deleteSelectedCities(selectedCities: List<City>) {
+        cityViewModel.deleteCities(selectedCities)
+
+        // Clear the selection in the adapter
+        favoriteLocationAdapter.clearSelection()
+
+        // Show success Snackbar
+        Snackbar.make(requireView(), "Successfully deleted selected cities", Snackbar.LENGTH_SHORT).show()
+    }
+
     override fun onFavoriteCityItemClick(city: City) {
-//        val action = FavoriteCitiesFragmentDirections.actionFavoriteCitiesFragmentToWeatherFragment(city)
-//        findNavController().navigate(action)
+        val weatherFragment = WeatherFragment()
+        val bundle = Bundle()
+        bundle.putDouble("lat", city.latitude)
+        bundle.putDouble("lon", city.longitude)
+        bundle.putString("city_name", city.name)
+
+        weatherFragment.arguments = bundle
+
+        parentFragmentManager.commit {
+            replace(R.id.fragmentContainer, weatherFragment)
+            addToBackStack(null)
+        }
     }
 
     override fun onSearchItemClicked(city: City) {

@@ -17,12 +17,27 @@ class WeatherViewModel @Inject constructor(
     private val _weatherState = MutableStateFlow<WeatherUiState>(WeatherUiState.Idle)
     val weatherState = _weatherState.asStateFlow()
 
-    fun fetchWeatherForCity(lat: Double, lon: Double) {
+    fun fetchWeatherForCity(lat: Double, lon: Double, cityName: String, isCurrentCity: Boolean = true) {
         viewModelScope.launch {
             _weatherState.value = WeatherUiState.Loading
             try {
                 // Stream updates from local and network sources
-                getWeatherUseCase.getWeather(lat, lon)
+                getWeatherUseCase.getWeather(lat, lon, isCurrentCity)
+                    .collect { weatherData ->
+                        _weatherState.value = WeatherUiState.Success(weatherData)
+                    }
+            } catch (e: Exception) {
+                _weatherState.value = WeatherUiState.Error(e.localizedMessage ?: "Unknown error")
+            }
+        }
+    }
+
+    fun fetchFavWeather(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            _weatherState.value = WeatherUiState.Loading
+            try {
+                // Stream updates from local and network sources
+                getWeatherUseCase.getFavWeather(lat, lon)
                     .collect { weatherData ->
                         _weatherState.value = WeatherUiState.Success(weatherData)
                     }

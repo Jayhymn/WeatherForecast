@@ -6,6 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class City(
+    val id: Long,
     val name: String,
     val state: String = "Unknown",
     val country: String,
@@ -15,6 +16,7 @@ data class City(
 
 fun City.toCityEntity(): CityEntity {
     return CityEntity(
+        id = id,
         name = name,
         state = state,
         country = country,

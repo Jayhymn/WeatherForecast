@@ -1,6 +1,8 @@
 package com.wakeupdev.weatherforecast.data.db.entities
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -8,9 +10,23 @@ import com.wakeupdev.weatherforecast.data.DailyForecast
 import com.wakeupdev.weatherforecast.data.HourlyTemperature
 import com.wakeupdev.weatherforecast.data.WeatherData
 
-@Entity(tableName = "weather")
+@Entity(
+    tableName = "weather",
+//    foreignKeys = [
+//        ForeignKey(
+//            entity = CityEntity::class,
+//            parentColumns = ["id"],
+//            childColumns = ["cityId"],
+//            onDelete = ForeignKey.CASCADE
+//        )
+//    ],
+    indices = [Index(value = ["cityName"], unique = true)]
+)
 data class WeatherEntity(
-    @PrimaryKey val cityName: String,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val currentLocation: Boolean = false,
+    val cityName: String,
+    val cityId: Long,
     val currentTemperature: Double,
     val weatherCondition: String,
     val weatherIcon: String,
