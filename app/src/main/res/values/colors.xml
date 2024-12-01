@@ -30,5 +30,7 @@
     <color name="in_progress_color">#80C9A3</color>
     <color name="input_border_color">#80C9A3</color>
     <color name="color_default_background_grey">#F4F4F4</color>
+    <color name="circle_stroke">#FF0000</color>
+    <color name="circle_fill">#66FF0000</color>
 </resources>
 

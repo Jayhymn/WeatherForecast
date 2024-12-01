@@ -73,19 +73,20 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
             citName = it.getString("city_name", "")
         }
 
-
         binding.btnNext7days.setOnClickListener {
             val dailyWeatherFragment = DailyWeatherFragment()
             val bundle = Bundle()
             bundle.putParcelable("weatherData", weatherDataList)
-
             dailyWeatherFragment.arguments = bundle
 
+            // Ensure the fragment is added to the back stack
             parentFragmentManager.commit {
                 replace(R.id.fragmentContainer, dailyWeatherFragment)
                 addToBackStack(null)
             }
         }
+
+
 
 
         binding.imgFavCities.setOnClickListener {
@@ -135,21 +136,6 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
                     // Handle case when location is not available
                     showPermissionDeniedMessage() // You can show a dialog or toast here to prompt the user for location permissions
                 }
-            }
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == Constants.LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                fetchWeatherForCurrentLocation()
-            } else {
-                showPermissionDeniedMessage()
             }
         }
     }

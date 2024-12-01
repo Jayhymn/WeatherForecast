@@ -20,7 +20,7 @@ import com.wakeupdev.weatherforecast.data.WeatherData
 //            onDelete = ForeignKey.CASCADE
 //        )
 //    ],
-    indices = [Index(value = ["cityName"], unique = true)]
+//    indices = [Index(value = ["cityName"], unique = true)]
 )
 data class WeatherEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,

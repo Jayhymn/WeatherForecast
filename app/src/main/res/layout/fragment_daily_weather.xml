@@ -4,29 +4,33 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:background="#ffffff"
     xmlns:tools="http://schemas.android.com/tools">
-    <RelativeLayout
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:background="@color/app_bar_color"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp">
-        <ImageButton
-            android:id="@+id/imgNavBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_back"
-            android:layout_marginStart="-20dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            style="@style/Widget.Material3.Button.TextButton"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:theme="@style/ToolbarTheme"
+            android:layout_margin="16dp"
+            android:id="@+id/toolbar"
+            android:background="@drawable/bg_appbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="City Name"
+
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetEnd="0dp"
+            android:elevation="4dp"
+            app:collapseIcon="@drawable/ic_arrow_back"
             />
-        <TextView
-            android:id="@+id/tvCityName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Gotham"
-            android:layout_centerInParent="true"
-            android:textSize="18sp"
-            />
-    </RelativeLayout>
+
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -34,6 +38,7 @@
         android:padding="10dp"
         android:layout_marginStart="5dp"
         android:textSize="18sp"
+        android:layout_marginTop="10dp"
         android:text="Today" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvHourlyForecast"

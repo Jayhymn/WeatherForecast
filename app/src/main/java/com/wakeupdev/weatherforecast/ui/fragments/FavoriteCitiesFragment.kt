@@ -4,6 +4,10 @@ import FavoriteCitiesAdapter
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +18,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -26,7 +31,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -35,14 +39,17 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import com.wakeupdev.weatherforecast.Constants.LOCATION_PERMISSION_REQUEST_CODE
 import com.wakeupdev.weatherforecast.R
 import com.wakeupdev.weatherforecast.data.api.City
+import com.wakeupdev.weatherforecast.databinding.CustomMarkerViewBinding
 import com.wakeupdev.weatherforecast.databinding.FragmentFavoriteCitiesBinding
 import com.wakeupdev.weatherforecast.ui.CityUiState
 import com.wakeupdev.weatherforecast.ui.adapters.CitySearchAdapter
@@ -64,6 +71,17 @@ class FavoriteCitiesFragment : Fragment(R.layout.fragment_favorite_cities),
     private lateinit var favoriteLocationAdapter: FavoriteCitiesAdapter
     private lateinit var citySearchAdapter: CitySearchAdapter
     private lateinit var searchView: SearchView
+    private var currentLocationMarker: Marker? = null
+    private var currentLocationMarkerTag: Any? = null
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            Log.d("WeatherFragment", "Permissions granted. Fetching weather...")
+            enableUserLocation()
+        } else {
+            showPermissionDeniedMessage()
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -232,6 +250,17 @@ class FavoriteCitiesFragment : Fragment(R.layout.fragment_favorite_cities),
         googleMap = map
         googleMap?.setOnMarkerClickListener(this)
 
+        try {
+            val success = googleMap?.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style)
+            ) ?: false
+            if (!success) {
+                Log.e("FavoriteCitiesFragment", "Style parsing failed.")
+            }
+        } catch (e: Resources.NotFoundException) {
+            Log.e("FavoriteCitiesFragment", "Can't find style. Error: ", e)
+        }
+
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -239,29 +268,96 @@ class FavoriteCitiesFragment : Fragment(R.layout.fragment_favorite_cities),
         ) {
             enableUserLocation()
         } else {
-            requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISSION_REQUEST_CODE
-            )
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
+
+        googleMap?.setOnMapClickListener { latLng ->
+            val geocoder = Geocoder(requireContext())
+            val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+
+            Log.d("FavoriteCitiesFragment", "onMapReady: $addresses")
+
+            if (addresses.isNullOrEmpty() || (addresses[0].locality == null && addresses[0].subAdminArea == null)) {
+                Toast.makeText(requireContext(), "Unknown address. Please select another region on the map.", Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                val address = addresses[0]
+                val cityName = address.locality ?: address.subAdminArea ?: "Unknown City"
+                val countryName = address.countryName ?: "Unknown Country"
+
+                val city = City(
+                    id = 0,
+                    name = cityName,
+                    latitude = latLng.latitude,
+                    longitude = latLng.longitude,
+                    state = "", // Add logic to fetch state if needed
+                    country = countryName
+                )
+
+                val fullCityName = "$cityName, ${city.state}, $countryName"
+                WeatherDialogFragment.newInstance(city, fullCityName).show(parentFragmentManager, "WeatherDialog")
+            }
+        }
+    }
+
+    private fun showPermissionDeniedMessage() {
+        Toast.makeText(requireContext(), "Location permission is required.", Toast.LENGTH_SHORT).show()
     }
 
     private fun enableUserLocation() {
         googleMap?.isMyLocationEnabled = true
 
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
-            location?.let {
-                val currentLatLng = LatLng(it.latitude, it.longitude)
-                googleMap?.apply {
-                    moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
-                    addMarker(MarkerOptions().position(currentLatLng).title("You are here"))
-                }
+            if (location == null) return@addOnSuccessListener
+
+            val currentLatLng = LatLng(location.latitude, location.longitude)
+            googleMap?.apply {
+                // Move the camera to the user's current location
+                moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 0f))
+
+                // Perform reverse geocoding to get address details
+                val geocoder = Geocoder(requireContext())
+                val addresses = geocoder.getFromLocation(currentLatLng.latitude, currentLatLng.longitude, 1)
+
+                // Determine the city name, state, and country or use a default fallback
+                val cityName = addresses?.firstOrNull()?.locality ?: "Current City"
+                val state = addresses?.firstOrNull()?.adminArea ?: ""
+                val country = addresses?.firstOrNull()?.countryCode ?: ""
+
+                val fullAddress = "$cityName, $state, $country"
+
+                // Add a marker with the custom icon at the current location
+                currentLocationMarker = addMarker(
+                    MarkerOptions()
+                        .position(currentLatLng)
+                        .icon(BitmapDescriptorFactory.fromBitmap(
+                            createCustomMarker(fullAddress, R.drawable.ic_clear_sky))
+                        )
+                        .title(fullAddress)
+                )
+
+                currentLocationMarkerTag = City(
+                    id = 0,
+                    state = state,
+                    country = country,
+                    latitude = currentLatLng.latitude,
+                    longitude = currentLatLng.longitude,
+                    name = cityName
+                )
+
+                currentLocationMarker?.tag = currentLocationMarkerTag
             }
         }
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
-        Toast.makeText(requireContext(), "Marker clicked: ${marker.title}", Toast.LENGTH_SHORT).show()
+        val city = marker.tag as? City
+
+        city?.let {
+            // Trigger the same action as a favorite city click
+            onFavoriteCityItemClick(it)
+        }
+
         return true
     }
 
@@ -301,6 +397,9 @@ class FavoriteCitiesFragment : Fragment(R.layout.fragment_favorite_cities),
                         is CityUiState.Success -> {
                             favoriteLocationAdapter.updateCities(favCitiesState.citiesData)
                             searchBinding.favLocation.tvTotalFavCities.text = "Total: ${favCitiesState.citiesData.size}"
+
+                            // Update map and refresh markers with favorite cities
+                            displayFavoriteCitiesOnMap(favCitiesState.citiesData)
                         }
                         else -> Unit
                     }
@@ -358,6 +457,61 @@ class FavoriteCitiesFragment : Fragment(R.layout.fragment_favorite_cities),
             addToBackStack(null)
         }
     }
+
+    private fun createCustomMarker(cityName: String, weatherIconResId: Int): Bitmap {
+        val binding = CustomMarkerViewBinding.inflate(layoutInflater)
+
+        // Set the data in the view elements
+        binding.tvCityName.text = cityName
+        binding.weatherIcon.setImageResource(weatherIconResId) // Weather condition icon
+//        binding.temperature.text = temperature
+
+        // Measure and layout the view to convert it to a bitmap
+        binding.root.measure(
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+        binding.root.layout(0, 0, binding.root.measuredWidth, binding.root.measuredHeight)
+
+        // Create a bitmap and draw the view into the bitmap
+        val bitmap = Bitmap.createBitmap(
+            binding.root.measuredWidth,
+            binding.root.measuredHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        binding.root.draw(canvas)
+
+        return bitmap
+    }
+
+    private fun displayFavoriteCitiesOnMap(favCities: List<City>) {
+        googleMap?.clear()
+
+        favCities.forEach { city ->
+            val position = LatLng(city.latitude, city.longitude)
+            val markerBitmap = createCustomMarker(city.name, R.drawable.ic_clear_sky)
+
+            val marker = googleMap?.addMarker(
+                MarkerOptions()
+                    .position(position)
+                    .icon(BitmapDescriptorFactory.fromBitmap(markerBitmap))
+            )
+
+            marker?.tag = city
+
+            //Highlight region around the city
+            googleMap?.addCircle(
+                CircleOptions()
+                    .center(position)
+                    .radius(5000.0) // 5 km radius
+                    .strokeColor(ContextCompat.getColor(requireContext(), R.color.circle_stroke))
+                    .fillColor(ContextCompat.getColor(requireContext(), R.color.circle_fill))
+                    .strokeWidth(2f)
+            )
+        }
+    }
+
 
     override fun onSearchItemClicked(city: City) {
         val cityName = "${city.name}, ${city.state}, ${city.country}"

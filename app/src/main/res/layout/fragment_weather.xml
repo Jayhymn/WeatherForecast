@@ -55,6 +55,7 @@
                     android:id="@+id/tvCityName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="150dp"
                     app:drawableStartCompat="@drawable/ic_location"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
