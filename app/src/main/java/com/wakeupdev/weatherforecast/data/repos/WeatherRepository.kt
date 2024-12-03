@@ -1,5 +1,6 @@
 package com.wakeupdev.weatherforecast.data.repos
 
+import android.util.Log
 import com.wakeupdev.weatherforecast.data.WeatherData
 import com.wakeupdev.weatherforecast.data.api.WeatherApiService
 import com.wakeupdev.weatherforecast.data.api.toWeatherData
@@ -40,8 +41,10 @@ class WeatherRepository @Inject constructor(
     }
 
     suspend fun syncWeatherData() {
-        // Example: Fetch and save data for all saved cities
+        // Fetch and save data for all saved cities
         val favoriteCities = cityDao.getFavoriteCities()
+
+        Log.d("WeatherRepository", "syncWeatherData: performing periodic sync")
 
         for (city in favoriteCities){
             val weather = apiService.getWeather(city.latitude, city.longitude)

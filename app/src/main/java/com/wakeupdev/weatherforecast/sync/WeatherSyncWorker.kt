@@ -1,4 +1,4 @@
-package com.wakeupdev.weatherforecast
+package com.wakeupdev.weatherforecast.sync
 
 import android.content.Context
 import android.util.Log
@@ -7,13 +7,13 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.wakeupdev.weatherforecast.utils.NotificationUtils
 import com.wakeupdev.weatherforecast.data.repos.WeatherRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
 @HiltWorker
-class SyncWorker @Inject constructor(
-    @ApplicationContext private val context: Context,
-    workerParams: WorkerParameters,
+class WeatherSyncWorker @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted workerParams: WorkerParameters,
     private val weatherRepository: WeatherRepository
 ) : CoroutineWorker(context, workerParams) {
 
@@ -28,7 +28,7 @@ class SyncWorker @Inject constructor(
             Result.success()
         } catch (e: Exception) {
             // Log or handle the exception here, and retry later if needed
-            Log.e("SyncWorker", "Failed to sync weather data: ${e.message}")
+            Log.e("WeatherSyncWorker", "Failed to sync weather data: ${e.message}")
             Result.retry()  // Retry the work in case of failure
         }
     }

@@ -8,6 +8,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.wakeupdev.weatherforecast.sync.WeatherSyncWorker
+import com.wakeupdev.weatherforecast.ui.di.WeatherCustomFactory
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -16,7 +18,21 @@ import javax.inject.Inject
 class WeatherApp : Application(), Configuration.Provider {
 
     @Inject
-    lateinit var workerFactory: HiltWorkerFactory
+    lateinit var workerFactory: WeatherCustomFactory
+
+    override fun onCreate() {
+        super.onCreate()
+
+        WorkManager.initialize(
+            this,
+            Configuration.Builder()
+                .setWorkerFactory(workerFactory)
+                .build()
+        )
+
+        // Schedule periodic sync work
+        schedulePeriodicSync()
+    }
 
     override fun getWorkManagerConfiguration(): Configuration {
         return Configuration.Builder()
@@ -24,27 +40,19 @@ class WeatherApp : Application(), Configuration.Provider {
             .build()
     }
 
-    override fun onCreate() {
-        super.onCreate()
-
-        // Schedule periodic sync work
-        schedulePeriodicSync()
-    }
-
     private fun schedulePeriodicSync() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val periodicSyncRequest = PeriodicWorkRequestBuilder<SyncWorker>(10, TimeUnit.MINUTES)
+        val periodicSyncRequest = PeriodicWorkRequestBuilder<WeatherSyncWorker>(20, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "WeatherSyncWork",
+            WeatherSyncWorker::class.java.simpleName,
             ExistingPeriodicWorkPolicy.KEEP, // Ensures no duplicate jobs
             periodicSyncRequest
         )
     }
 }
-

@@ -78,14 +78,11 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.play.services.location)
     implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.hilt.common)
-    implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.viewpager2)
 
     testImplementation(libs.testng)
-    testImplementation(libs.hilt.android.testing)
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
@@ -102,10 +99,6 @@ dependencies {
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
 
-    // for dagger hilt
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-
     implementation(libs.lottie)
     implementation (libs.mpandroidchart)
 
@@ -121,11 +114,24 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
-    //hilt testing
+    //hilt
+    // for dagger hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+//    kapt(libs.androidx.hilt.compiler)
+
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
+    testImplementation(libs.hilt.android.testing)
+
     androidTestImplementation (libs.hilt.android.testing)
     kaptAndroidTest (libs.hilt.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+kapt {
+    correctErrorTypes = true
 }

@@ -1,7 +1,9 @@
 package com.wakeupdev.weatherforecast.ui.di
 
 import android.content.Context
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.room.Room
+import androidx.work.WorkerFactory
 import com.wakeupdev.weatherforecast.BuildConfig
 import com.wakeupdev.weatherforecast.data.repos.CityRepository
 import com.wakeupdev.weatherforecast.data.api.GeocodingApiService
