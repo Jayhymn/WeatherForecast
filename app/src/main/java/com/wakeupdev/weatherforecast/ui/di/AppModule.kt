@@ -17,6 +17,8 @@ import com.wakeupdev.weatherforecast.data.LocalDatabase
 import com.wakeupdev.weatherforecast.domain.FormatDateUseCase
 import com.wakeupdev.weatherforecast.domain.GetCityUseCase
 import com.wakeupdev.weatherforecast.domain.GetWeatherUseCase
+import com.wakeupdev.weatherforecast.utils.Logger
+import com.wakeupdev.weatherforecast.utils.LoggerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -120,12 +122,20 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideLogger(): Logger {
+        return LoggerImpl()
+    }
+
+
+    @Provides
+    @Singleton
     fun provideWeatherRepository(
         weatherApiService: WeatherApiService,
         weatherDao: WeatherDao,
         cityDao: CityDao,
+        logger: Logger
     ): WeatherRepository {
-        return WeatherRepository(weatherApiService, weatherDao, cityDao)
+        return WeatherRepository(weatherApiService, weatherDao, cityDao, logger)
     }
 
     @Provides
@@ -134,16 +144,18 @@ object AppModule {
         geocodingApiService: GeocodingApiService,
         weatherDao: WeatherDao,
         cityDao: CityDao,
+        logger: Logger
     ): CityRepository {
-        return CityRepository(geocodingApiService, weatherDao, cityDao)
+        return CityRepository(geocodingApiService, weatherDao, cityDao, logger)
     }
 
     @Provides
     @Singleton
     fun provideGetWeatherUseCase(
+        logger: Logger,
         weatherRepository: WeatherRepository
     ): GetWeatherUseCase {
-        return GetWeatherUseCase(weatherRepository)
+        return GetWeatherUseCase(logger, weatherRepository)
     }
 
     @Provides
@@ -156,7 +168,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFormatDateUseCase(): FormatDateUseCase {
-        return FormatDateUseCase()
+    fun provideFormatDateUseCase(
+        logger: Logger
+    ): FormatDateUseCase {
+        return FormatDateUseCase(logger)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorkerFactory(hiltWorkerFactory: HiltWorkerFactory): WorkerFactory {
+        return hiltWorkerFactory
     }
 }

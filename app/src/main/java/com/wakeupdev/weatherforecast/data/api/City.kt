@@ -12,7 +12,12 @@ data class City(
     val country: String,
     val latitude: Double,
     val longitude: Double
-) : Parcelable
+) : Parcelable {
+    // to get the full name as a concatenated string
+    fun getDisplayName(): String {
+        return "$name, $state, $country"
+    }
+}
 
 fun City.toCityEntity(): CityEntity {
     return CityEntity(

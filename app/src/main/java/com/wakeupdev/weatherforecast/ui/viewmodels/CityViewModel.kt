@@ -39,7 +39,7 @@ class CityViewModel @Inject constructor(
         }
     }
 
-    private fun getFavoriteCities() {
+    fun getFavoriteCities() {
         viewModelScope.launch {
             _favCities.value = CityUiState.Loading
             try {

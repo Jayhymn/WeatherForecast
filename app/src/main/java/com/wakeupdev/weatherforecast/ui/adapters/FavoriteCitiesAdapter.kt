@@ -57,7 +57,7 @@ class FavoriteCitiesAdapter(
 
     inner class FavoriteCityHolder(private val binding: ItemFavoriteCityBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(city: City) {
-            binding.tvCityName.text = city.name
+            binding.tvCityName.text = city.getDisplayName()
             binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     selectedCities.add(city)

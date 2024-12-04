@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.androidx.viewpager2)
 
     testImplementation(libs.testng)
+    testImplementation(libs.junit.jupiter)
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
@@ -107,9 +108,6 @@ dependencies {
 
     testImplementation (libs.androidx.core.testing)
 
-    // For Coroutine testing
-    testImplementation (libs.kotlinx.coroutines.test)
-
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
@@ -130,6 +128,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    testImplementation(libs.mockk)
+    testImplementation (libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
 }
 
 kapt {

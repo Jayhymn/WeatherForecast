@@ -1,35 +1,33 @@
 package com.wakeupdev.weatherforecast.domain
 
-import android.util.Log
+import com.wakeupdev.weatherforecast.utils.Logger
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
-class FormatDateUseCase @Inject constructor() {
-
+class FormatDateUseCase @Inject constructor(
+    private val logger: Logger  // Inject your logger
+) {
     private val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 
-    // Function to convert Unix time (UTC) to formatted date (only the date part)
     operator fun invoke(unixTimestamp: Long?): String {
         return try {
-            // Check for null or invalid timestamp
             if (unixTimestamp == null || unixTimestamp <= 0) {
-                Log.e("FormatDateUseCase", "Invalid or null timestamp: $unixTimestamp")
+                logger.e("FormatDateUseCase", "Invalid or null timestamp: $unixTimestamp")  // Use logger here
                 return "Invalid Date"
             }
 
-            // Convert Unix timestamp (seconds) to Date object
-            Log.d("FormatDateUseCase", "Converting timestamp $unixTimestamp to date format")
+            logger.d("FormatDateUseCase", "Converting timestamp $unixTimestamp to date format")  // Use logger here
 
             val date = Date(unixTimestamp * 1000L)  // Convert seconds to milliseconds
             val formattedDate = outputFormat.format(date)
 
-            Log.d("FormatDateUseCase", "Formatted Date: $formattedDate")  // Log the result
+            logger.d("FormatDateUseCase", "Formatted Date: $formattedDate")  // Log the result using logger
             formattedDate
         } catch (e: Exception) {
             // Handle any errors and log them
-            Log.e("FormatDateUseCase", "Error converting timestamp: ${e.message}", e)
+            logger.e("FormatDateUseCase", "Error converting timestamp: ${e.message}", e)  // Use logger here
             "Invalid Date"
         }
     }

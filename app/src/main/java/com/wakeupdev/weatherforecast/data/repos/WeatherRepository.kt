@@ -10,6 +10,7 @@ import com.wakeupdev.weatherforecast.data.db.dao.WeatherDao
 import com.wakeupdev.weatherforecast.data.db.entities.WeatherEntity
 import com.wakeupdev.weatherforecast.data.db.entities.toWeatherData
 import com.wakeupdev.weatherforecast.data.toEntity
+import com.wakeupdev.weatherforecast.utils.Logger
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -17,6 +18,7 @@ class WeatherRepository @Inject constructor(
     private val apiService: WeatherApiService,
     private val weatherDao: WeatherDao,
     private val cityDao: CityDao,
+    private val logger: Logger // Inject Logger
 ) {
     fun getCurrentWeather(): Flow<WeatherEntity?> {
         return weatherDao.getCurrentWeather()
@@ -34,7 +36,10 @@ class WeatherRepository @Inject constructor(
 
             weatherData
         } catch (e: Exception) {
-            // get from cache if available
+            // Log the error
+            logger.e("WeatherRepository", "Error fetching weather from API for coordinates: $lat, $lon", e)
+
+            // Get from cache if available
             val cachedData = weatherDao.getWeatherData(lat, lon)
             cachedData?.toWeatherData() ?: throw e
         }
@@ -44,21 +49,22 @@ class WeatherRepository @Inject constructor(
         // Fetch and save data for all saved cities
         val favoriteCities = cityDao.getFavoriteCities()
 
-        Log.d("WeatherRepository", "syncWeatherData: performing periodic sync")
+        logger.e("WeatherRepository", "syncWeatherData: performing periodic sync", Exception())
 
-        for (city in favoriteCities){
-            val weather = apiService.getWeather(city.latitude, city.longitude)
-            val weatherEntity = weather.toWeatherEntity()
+        for (city in favoriteCities) {
+            try {
+                val weather = apiService.getWeather(city.latitude, city.longitude)
+                val weatherEntity = weather.toWeatherEntity()
 
-            // update / save to database
-            weatherDao.updateWeatherData(weatherEntity.copy(id = city.id))
+                // Update / save to database
+                weatherDao.updateWeatherData(weatherEntity.copy(id = city.id))
+
+            } catch (e: Exception) {
+                // Log the error
+                logger.e("WeatherRepository", "Error syncing weather data for city: ${city.name}", e)
+            }
         }
     }
-
-//    suspend fun cacheWeatherData(weatherData: WeatherData, isCurrentCity: Boolean) {
-//        val weatherEntity = weatherData.toEntity().copy(currentLocation = isCurrentCity)
-//        weatherDao.insertWeatherData(weatherEntity)
-//    }
 
     suspend fun cacheWeatherData(weatherData: WeatherData, isCurrentCity: Boolean) {
         val existingData = if (isCurrentCity) {

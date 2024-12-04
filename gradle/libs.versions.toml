@@ -19,6 +19,7 @@ kotlinxCoroutinesTest = "1.6.0"
 lifecycleViewmodelKtx = "2.8.6"
 lottie = "3.4.0"
 materialCalendarview = "2.0.0"
+mockk = "1.13.4"
 mpandroidchart = "v3.1.0"
 okhttpUrlconnection = "3.0.1"
 playServicesIid = "17.0.0"
@@ -35,6 +36,7 @@ hiltCommon = "1.2.0"
 hiltWork = "1.2.0"
 navigationFragmentKtx = "2.8.4"
 navigationUiKtx = "2.8.4"
+junitJupiter = "5.8.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -65,6 +67,7 @@ hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", vers
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 material-calendarview = { module = "com.github.prolificinteractive:material-calendarview", version.ref = "materialCalendarview" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
 okhttp-urlconnection = { module = "com.squareup.okhttp3:okhttp-urlconnection", version.ref = "okhttpUrlconnection" }
 play-services-iid = { module = "com.google.android.gms:play-services-iid", version.ref = "playServicesIid" }
@@ -81,6 +84,7 @@ androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref =
 #androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWork" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

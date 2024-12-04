@@ -170,7 +170,12 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
         binding.btnNext7days.isEnabled = true
         weatherDataList = weatherData
 
-        binding.tvCityName.text = weatherData.cityName?.split("/")?.get(1) ?: ""
+        if (citName.isNotEmpty()){
+            binding.tvCityName.text = citName
+        } else {
+            binding.tvCityName.text = weatherData.cityName?.split("/")?.get(1) ?: ""
+        }
+
         binding.tvCurrentTemperature.text = getString(R.string.current_temperature, weatherData.currentTemperature)
 
         // Update line chart using ChartHelper

@@ -19,7 +19,7 @@ data class CityEntity(
 fun CityEntity.toCityData(): City {
     return City(
         id = id,
-        name = "$name,$state, $country",
+        name = name,
         state = state,
         country = country,
         latitude = latitude,

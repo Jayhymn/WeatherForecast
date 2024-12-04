@@ -448,7 +448,7 @@ class FavoriteCitiesFragment : Fragment(R.layout.fragment_favorite_cities),
         val bundle = Bundle()
         bundle.putDouble("lat", city.latitude)
         bundle.putDouble("lon", city.longitude)
-        bundle.putString("city_name", city.name)
+        bundle.putString("city_name", city.getDisplayName())
 
         weatherFragment.arguments = bundle
 

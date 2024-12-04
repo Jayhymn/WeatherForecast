@@ -18,7 +18,7 @@ class WeatherSyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        setForegroundAsync(NotificationUtils.createForegroundInfo(context, "Refreshing weather forecast data"))
+//        setForegroundAsync(NotificationUtils.createForegroundInfo(context, "Refreshing weather forecast data"))
 
         return try {
             // Fetch weather data from the API and update the database
