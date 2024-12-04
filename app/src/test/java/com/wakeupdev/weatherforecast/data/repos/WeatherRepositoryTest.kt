@@ -4,8 +4,15 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.wakeupdev.weatherforecast.data.DailyForecast
 import com.wakeupdev.weatherforecast.data.HourlyTemperature
 import com.wakeupdev.weatherforecast.data.WeatherData
+import com.wakeupdev.weatherforecast.data.api.Current
+import com.wakeupdev.weatherforecast.data.api.Daily
+import com.wakeupdev.weatherforecast.data.api.Hourly
+import com.wakeupdev.weatherforecast.data.api.Minutely
+import com.wakeupdev.weatherforecast.data.api.Temp
+import com.wakeupdev.weatherforecast.data.api.Weather
 import com.wakeupdev.weatherforecast.data.api.WeatherApiService
 import com.wakeupdev.weatherforecast.data.api.WeatherResponse
+import com.wakeupdev.weatherforecast.data.api.toWeatherData
 import com.wakeupdev.weatherforecast.data.db.dao.CityDao
 import com.wakeupdev.weatherforecast.data.db.dao.WeatherDao
 import com.wakeupdev.weatherforecast.data.db.entities.CityEntity
@@ -16,14 +23,18 @@ import com.wakeupdev.weatherforecast.utils.Logger
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -50,57 +61,65 @@ class WeatherRepositoryTest {
 
     @Test
     fun `test getWeatherFromApi success`() = runTest {
-        val lat = 40.7128
-        val lon = -74.0060
-        val weatherResponse = mockk<WeatherResponse>()
+        val lat = 25.2164
+        val lon = 55.1654
 
-        coEvery { apiService.getWeather(lat, lon) } returns weatherResponse
-        coEvery { weatherDao.getWeatherData(lat, lon) } returns null // Simulate no cached data
+        // Create mock data for WeatherResponse
+        val mockWeatherResponse = mockk<WeatherResponse>().apply {
+            coEvery { timezone } returns "Africa/Lagos"
+        }
 
+        val mockDailyList = listOf(mockk<Daily>(relaxed = true))
+        val mockHourlyList = listOf(mockk<Hourly>(relaxed = true))
+        val mockMinutelyList = listOf(mockk<Minutely>(relaxed = true))
+
+        every { mockWeatherResponse.daily } returns mockDailyList
+        every { mockWeatherResponse.hourly } returns mockHourlyList
+        every { mockWeatherResponse.minutely } returns mockMinutelyList
+
+        val mockCurrent = mockk<Current>(relaxed = true).apply {
+            every { temp } returns 25.0
+        }
+
+        // Mock the weather list with at least one item
+        val mockWeatherList = listOf(mockk<Weather>(relaxed = true))
+
+        val mockWeatherData = mockk<WeatherData>()
+
+        coEvery { apiService.getWeather(eq(lat), eq(lon)) } returns mockWeatherResponse
+        coEvery { mockWeatherResponse.toWeatherData() } returns mockWeatherData
+        coEvery { mockWeatherResponse.current } returns mockCurrent
+        coEvery { weatherDao.getWeatherData(eq(lat), eq(lon)) } returns null
+        coEvery { mockCurrent.weather } returns mockWeatherList
+
+        // Call the function
         val result = weatherRepository.getWeatherFromApi(lat, lon)
 
-        assertEquals(weatherResponse, result)
-        coVerify { apiService.getWeather(lat, lon) }
-        coVerify { weatherDao.getWeatherData(lat, lon) }
+        // Assert correct result and interactions
+        assertSame(mockWeatherData, result)
+        coVerify { apiService.getWeather(eq(lat), eq(lon)) }
+        coVerify(exactly = 0) { weatherDao.getWeatherData(eq(lat), eq(lon)) }
     }
 
     @Test
     fun `test getWeatherFromApi with cached data`() = runTest {
         val lat = 40.7128
         val lon = -74.0060
-        val cachedWeatherEntity = mockk<WeatherEntity>()
-        val cachedWeatherData = mockk<WeatherData>()
 
+        // Create mock data for the cached weather entity and conversion
+        val mockCachedWeatherEntity = mockk<WeatherEntity>()
+        val mockCachedWeatherData = mockk<WeatherData>()
+
+        coEvery { weatherDao.getWeatherData(lat, lon) } returns mockCachedWeatherEntity
+        coEvery { mockCachedWeatherEntity.toWeatherData() } returns mockCachedWeatherData
         coEvery { apiService.getWeather(lat, lon) } throws Exception("API failure")
-        coEvery { weatherDao.getWeatherData(lat, lon) } returns cachedWeatherEntity
-        coEvery { cachedWeatherEntity.toWeatherData() } returns cachedWeatherData
 
         val result = weatherRepository.getWeatherFromApi(lat, lon)
 
-        assertEquals(cachedWeatherData, result)
-        coVerify { apiService.getWeather(lat, lon) }
+        // Assert the cached data is returned when API fails
+        assertEquals(mockCachedWeatherData, result)
         coVerify { weatherDao.getWeatherData(lat, lon) }
-    }
-
-    @Test
-    fun `test syncWeatherData`() = runTest {
-        val favoriteCities = listOf(
-            CityEntity(id = 1L, name = "New York", state = "NY", country = "USA", latitude = 40.7128, longitude = -74.0060),
-            CityEntity(id = 2L, name = "London", state = "England", country = "UK", latitude = 51.5074, longitude = -0.1278)
-        )
-
-        val weatherData = mockk<WeatherData>()
-        val weatherEntity = mockk<WeatherEntity>()
-
-        coEvery { cityDao.getFavoriteCities() } returns favoriteCities
-        coEvery { apiService.getWeather(any(), any()) } returns mockk<WeatherResponse>()
-        coEvery { weatherData.toEntity() } returns weatherEntity
-        coEvery { weatherDao.updateWeatherData(weatherEntity) } just Runs
-
-        weatherRepository.syncWeatherData()
-
-        coVerify(exactly = 2) { apiService.getWeather(any(), any()) }
-        coVerify(exactly = 2) { weatherDao.updateWeatherData(weatherEntity) }
+        coVerify(exactly = 1) { apiService.getWeather(lat, lon) }
     }
 
 

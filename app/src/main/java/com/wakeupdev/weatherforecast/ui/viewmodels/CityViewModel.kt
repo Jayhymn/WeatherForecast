@@ -1,6 +1,5 @@
 package com.wakeupdev.weatherforecast.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wakeupdev.weatherforecast.data.WeatherData
@@ -8,6 +7,7 @@ import com.wakeupdev.weatherforecast.data.api.City
 import com.wakeupdev.weatherforecast.data.repos.CityRepository
 import com.wakeupdev.weatherforecast.data.api.GeocodingApiService
 import com.wakeupdev.weatherforecast.ui.CityUiState
+import com.wakeupdev.weatherforecast.utils.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +18,7 @@ import javax.inject.Inject
 class CityViewModel @Inject constructor(
     private val geocodingApiService: GeocodingApiService,
     private val cityRepository: CityRepository,
+    private val logger: Logger
 ) : ViewModel() {
 
     private val _favCities = MutableStateFlow<CityUiState>(CityUiState.Idle)
@@ -33,7 +34,7 @@ class CityViewModel @Inject constructor(
                 val citiesData = cityRepository.searchCity(searchQuery)
                 _citiesDataSearch.value = CityUiState.Success(citiesData)
             } catch (e: Exception) {
-                Log.e("CityViewModel", "searchCity: $e", )
+                logger.e("CityViewModel", "searchCity: $e", e)
                 _citiesDataSearch.value = CityUiState.Error(e.localizedMessage)
             }
         }
@@ -46,10 +47,10 @@ class CityViewModel @Inject constructor(
                 // Stream the data using Flow
                 cityRepository.getFavCities().collect { favoriteCities ->
                     _favCities.value = CityUiState.Success(favoriteCities)
-                    Log.d("CityViewModel", "getFavoriteCities: $favoriteCities")
+                    logger.d("CityViewModel", "getFavoriteCities: $favoriteCities")
                 }
             } catch (e: Exception) {
-                Log.e("CityViewModel", "getFavoriteCities: $e")
+                logger.e("CityViewModel", "getFavoriteCities: $e", e)
                 _favCities.value = CityUiState.Error(e.localizedMessage)
             }
         }

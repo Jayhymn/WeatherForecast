@@ -7,7 +7,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 class FormatDateUseCase @Inject constructor(
-    private val logger: Logger  // Inject your logger
+    private val logger: Logger
 ) {
     private val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 

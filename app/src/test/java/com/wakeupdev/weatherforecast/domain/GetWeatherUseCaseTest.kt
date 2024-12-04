@@ -12,7 +12,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +30,7 @@ class GetWeatherUseCaseTest {
     }
 
     @Test
-    fun `test getWeather returns local data and network data`() = runBlocking {
+    fun `test getWeather returns local data and network data`() = runTest {
         val lat = 40.7128
         val lon = -74.0060
         val isCurrentCity = true
@@ -96,7 +96,7 @@ class GetWeatherUseCaseTest {
     }
 
     @Test
-    fun `test getWeather handles network error`() = runBlocking {
+    fun `test getWeather handles network error`() = runTest {
         val lat = 40.7128
         val lon = -74.0060
         val isCurrentCity = true
@@ -122,7 +122,7 @@ class GetWeatherUseCaseTest {
     }
 
     @Test
-    fun `test getFavWeather handles network error`() = runBlocking {
+    fun `test getFavWeather handles network error`() = runTest {
         val lat = 40.7128
         val lon = -74.0060
 

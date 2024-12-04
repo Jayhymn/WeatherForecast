@@ -9,10 +9,12 @@ import com.wakeupdev.weatherforecast.data.api.City
 import com.wakeupdev.weatherforecast.data.api.GeocodingApiService
 import com.wakeupdev.weatherforecast.data.repos.CityRepository
 import com.wakeupdev.weatherforecast.ui.CityUiState
+import com.wakeupdev.weatherforecast.utils.Logger
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -30,6 +32,7 @@ class CityViewModelTest {
     private lateinit var cityViewModel: CityViewModel
     private val cityRepository: CityRepository = mockk()
     private val geocodingApiService: GeocodingApiService = mockk()
+    private val mockLogger: Logger = mockk(relaxed = true)
 
     // Use TestCoroutineDispatcher to control coroutines in tests
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -37,9 +40,7 @@ class CityViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        cityViewModel = CityViewModel(geocodingApiService, cityRepository)
-        mockkStatic(Log::class)
-        every { Log.e(any(), any(), any()) } returns 0
+        cityViewModel = CityViewModel(geocodingApiService, cityRepository, mockLogger)
     }
 
     @Test
@@ -56,17 +57,28 @@ class CityViewModelTest {
         )
         coEvery { cityRepository.searchCity(searchQuery) } returns cities
 
+        // Launch the view model searchCity method
         cityViewModel.searchCity(searchQuery)
 
-        // Observe the StateFlow
-        cityViewModel.citiesSearch.collect { state ->
-            when (state) {
-                is CityUiState.Success -> assertEquals(cities, state.citiesData)
-                is CityUiState.Error -> fail("Expected success, but got error")
-                is CityUiState.Loading -> fail("Expected success, but got loading")
-                is CityUiState.Idle -> fail("Expected success, but got idle")
+        // Wait until all coroutines are idle
+        advanceUntilIdle()
+
+        var state: CityUiState = CityUiState.Idle
+        val job = launch {
+            cityViewModel.citiesSearch.collect {
+                state = it
             }
         }
+
+        // Wait for all coroutines to finish
+        advanceUntilIdle()
+
+        // Assert that the state has updated to Success
+        assert(state is CityUiState.Success)
+        assertEquals(cities, (state as CityUiState.Success).citiesData)
+
+        // Cancel the collection job to clean up
+        job.cancel()
     }
 
     @Test
@@ -75,17 +87,25 @@ class CityViewModelTest {
         val exception = Exception("Network error")
         coEvery { cityRepository.searchCity(searchQuery) } throws exception
 
+        // Launch the view model searchCity method
         cityViewModel.searchCity(searchQuery)
 
-        // Observe the StateFlow
-        cityViewModel.citiesSearch.collect { state ->
-            when (state) {
-                is CityUiState.Error -> assertEquals("Network error", state.message)
-                is CityUiState.Success -> fail("Expected error, but got success")
-                is CityUiState.Loading -> fail("Expected error, but got loading")
-                is CityUiState.Idle -> fail("Expected error, but got idle")
+        var state: CityUiState = CityUiState.Idle
+        val job = launch {
+            cityViewModel.citiesSearch.collect {
+                state = it
             }
         }
+
+        // Wait until all coroutines are idle
+        advanceUntilIdle()
+
+        // Assert that the state is Error
+        assert(state is CityUiState.Error)
+        assertEquals("Network error", (state as CityUiState.Error).message)
+
+        // Cancel the collection job to clean up
+        job.cancel()
     }
 
     @Test
@@ -110,17 +130,29 @@ class CityViewModelTest {
         )
         coEvery { cityRepository.getFavCities() } returns flow { emit(cities) }
 
+        // Launch the view model getFavoriteCities method
         cityViewModel.getFavoriteCities()
 
-        // Observe the StateFlow
-        cityViewModel.favCities.collect { state ->
-            when (state) {
-                is CityUiState.Success -> assertEquals(cities, state.citiesData)
-                is CityUiState.Error -> fail("Expected success, but got error")
-                is CityUiState.Loading -> fail("Expected success, but got loading")
-                is CityUiState.Idle -> fail("Expected success, but got idle")
+        // Wait until all coroutines are idle
+        advanceUntilIdle()
+
+        // Collect the state of the favCities flow
+        var state: CityUiState = CityUiState.Idle
+        val job = launch {
+            cityViewModel.favCities.collect {
+                state = it
             }
         }
+
+        // Wait until the flow has completed
+        advanceUntilIdle()
+
+        // Assert that the state is Success
+        assert(state is CityUiState.Success)
+        assertEquals(cities, (state as CityUiState.Success).citiesData)
+
+        // Cancel the collection job to clean up
+        job.cancel()
     }
 
     @Test
@@ -130,16 +162,23 @@ class CityViewModelTest {
 
         cityViewModel.getFavoriteCities()
 
-        // Observe the StateFlow
-        cityViewModel.favCities.collect { state ->
-            when (state) {
-                is CityUiState.Error -> assertEquals("Error fetching favorite cities", state.message)
-                is CityUiState.Success -> fail("Expected error, but got success")
-                is CityUiState.Loading -> fail("Expected error, but got loading")
-                is CityUiState.Idle -> fail("Expected error, but got idle")
+        // Use a coroutine to collect the state asynchronously
+        var state: CityUiState = CityUiState.Idle // Start with Idle state
+        val job = launch {
+            cityViewModel.favCities.collect {
+                state = it
             }
         }
+
+        advanceUntilIdle()
+
+        assert(state is CityUiState.Error)
+        assertEquals("Error fetching favorite cities", (state as CityUiState.Error).message)
+
+        // Clean up by canceling the collection job
+        job.cancel()
     }
+
 
     @Test
     fun `test saveFavoriteCity`() = runTest {
@@ -189,13 +228,25 @@ class CityViewModelTest {
     fun `test clearSearchCitiesData`() = runTest {
         cityViewModel.clearSearchCitiesData()
 
-        cityViewModel.citiesSearch.collect { state ->
-            when (state) {
-                is CityUiState.Success -> assertTrue(state.citiesData.isEmpty())
-                else -> fail("Expected Success state with empty list, but got ${state::class}")
+        var state: CityUiState = CityUiState.Idle // Start with Idle state
+        val job = launch {
+            cityViewModel.citiesSearch.collect {
+                state = it // Update the state when the flow emits
             }
         }
+
+        // Allow time for the flow to emit
+        advanceUntilIdle()
+
+        if (state is CityUiState.Success) {
+            assertTrue((state as CityUiState.Success).citiesData.isEmpty())
+        } else {
+            fail("Expected Success state with empty list, but got ${state::class}")
+        }
+
+        job.cancel()
     }
+
 
     @Test
     fun `test deleteCities`() = runTest {

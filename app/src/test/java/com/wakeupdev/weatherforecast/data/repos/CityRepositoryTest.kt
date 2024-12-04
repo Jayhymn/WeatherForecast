@@ -19,7 +19,8 @@ import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
+
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -72,7 +73,7 @@ class CityRepositoryTest {
     }
 
     @Test
-    fun `test searchCity success`() = runBlocking {
+    fun `test searchCity success`() = runTest {
         val searchQuery = "New York"
 
         // Create mock data for GeocodeRes
@@ -121,7 +122,7 @@ class CityRepositoryTest {
 
 
     @Test
-    fun `test getFavCities returns flow of cities`() = runBlocking {
+    fun `test getFavCities returns flow of cities`() = runTest {
         val mockFavCitiesEntity = listOf(sampleCity.toCityEntity())
         val mockFavCities = listOf(sampleCity)
 
@@ -137,7 +138,7 @@ class CityRepositoryTest {
     }
 
     @Test
-    fun `test saveFavCity success`() = runBlocking {
+    fun `test saveFavCity success`() = runTest {
         val mockCityEntity = sampleCity.toCityEntity()
         val mockWeatherDataEntity = sampleWeatherData.toEntity()
 
@@ -156,7 +157,7 @@ class CityRepositoryTest {
     }
 
     @Test
-    fun `test saveFavCity logs error on failure`() = runBlocking {
+    fun `test saveFavCity logs error on failure`() = runTest {
         val mockCityEntity = sampleCity.toCityEntity()
         val mockWeatherDataEntity = sampleWeatherData.toEntity()
         coEvery { cityDao.insert(mockCityEntity) } throws Exception("Insertion failed")
@@ -171,7 +172,7 @@ class CityRepositoryTest {
     }
 
     @Test
-    fun `test deleteCities success`() = runBlocking {
+    fun `test deleteCities success`() = runTest {
         val citiesToDelete = listOf(sampleCity)
 
         coEvery { cityDao.deleteCities(citiesToDelete.map { it.id }) } returns Unit
