@@ -1,4 +1,4 @@
-package com.wakeupdev.weatherforecast.ui.adapters
+package com.wakeupdev.weatherforecast.presentation.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.wakeupdev.weatherforecast.R
 import com.wakeupdev.weatherforecast.databinding.DailyForecastItemBinding
-import com.wakeupdev.weatherforecast.data.DailyForecast
+import com.wakeupdev.weatherforecast.data.db.DailyForecast
 import com.wakeupdev.weatherforecast.Constants
 
 class WeatherDailyAdapter(

@@ -1,14 +1,14 @@
-package com.wakeupdev.weatherforecast.ui.di
+package com.wakeupdev.weatherforecast.di
 
 import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.room.Room
 import androidx.work.WorkerFactory
 import com.wakeupdev.weatherforecast.BuildConfig
-import com.wakeupdev.weatherforecast.data.repos.CityRepository
+import com.wakeupdev.weatherforecast.data.db.repo.CityRepository
 import com.wakeupdev.weatherforecast.data.api.GeocodingApiService
 import com.wakeupdev.weatherforecast.data.db.dao.CityDao
-import com.wakeupdev.weatherforecast.data.repos.WeatherRepository
+import com.wakeupdev.weatherforecast.data.db.repo.WeatherRepository
 import com.wakeupdev.weatherforecast.data.api.WeatherApiService
 import com.wakeupdev.weatherforecast.data.db.dao.WeatherDao
 import com.wakeupdev.weatherforecast.ApiKeyInterceptor
@@ -17,8 +17,6 @@ import com.wakeupdev.weatherforecast.data.LocalDatabase
 import com.wakeupdev.weatherforecast.domain.FormatDateUseCase
 import com.wakeupdev.weatherforecast.domain.GetCityUseCase
 import com.wakeupdev.weatherforecast.domain.GetWeatherUseCase
-import com.wakeupdev.weatherforecast.utils.Logger
-import com.wakeupdev.weatherforecast.utils.LoggerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

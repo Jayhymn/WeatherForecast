@@ -1,8 +1,7 @@
-package com.wakeupdev.weatherforecast.data
+package com.wakeupdev.weatherforecast.data.db
 
 import android.os.Parcelable
 import com.google.gson.Gson
-import com.wakeupdev.weatherforecast.data.db.entities.WeatherEntity
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

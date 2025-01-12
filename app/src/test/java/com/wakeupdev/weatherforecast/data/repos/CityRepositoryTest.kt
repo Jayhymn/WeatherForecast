@@ -7,20 +7,18 @@ import com.wakeupdev.weatherforecast.data.api.City
 import com.wakeupdev.weatherforecast.data.api.GeocodeRes
 import com.wakeupdev.weatherforecast.data.api.GeocodeResItem
 import com.wakeupdev.weatherforecast.data.api.GeocodingApiService
-import com.wakeupdev.weatherforecast.data.db.dao.CityDao
-import com.wakeupdev.weatherforecast.data.db.dao.WeatherDao
-import com.wakeupdev.weatherforecast.data.repos.CityRepository
-import com.wakeupdev.weatherforecast.data.toEntity
 import com.wakeupdev.weatherforecast.data.api.toCityData
 import com.wakeupdev.weatherforecast.data.api.toCityEntity
-import com.wakeupdev.weatherforecast.data.db.entities.toCityData
+import com.wakeupdev.weatherforecast.data.db.dao.CityDao
+import com.wakeupdev.weatherforecast.data.db.dao.WeatherDao
+import com.wakeupdev.weatherforecast.data.toEntity
 import com.wakeupdev.weatherforecast.utils.Logger
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

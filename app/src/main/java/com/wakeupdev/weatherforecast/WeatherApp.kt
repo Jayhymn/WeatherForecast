@@ -8,8 +8,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.wakeupdev.weatherforecast.sync.WeatherSyncWorker
-import com.wakeupdev.weatherforecast.ui.di.WeatherCustomFactory
+import com.wakeupdev.weatherforecast.presentation.SyncWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

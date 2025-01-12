@@ -1,4 +1,4 @@
-package com.wakeupdev.weatherforecast.data.db.entities
+package com.wakeupdev.weatherforecast.data.db
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

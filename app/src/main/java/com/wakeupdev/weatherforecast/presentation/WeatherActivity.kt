@@ -1,4 +1,4 @@
-package com.wakeupdev.weatherforecast.ui
+package com.wakeupdev.weatherforecast.presentation
 
 import android.animation.ObjectAnimator
 import android.os.Build
@@ -9,12 +9,9 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.fragment.app.commit
-import androidx.navigation.findNavController
-import androidx.navigation.ui.setupWithNavController
 import com.wakeupdev.weatherforecast.R
 import com.wakeupdev.weatherforecast.databinding.ActivityWeatherBinding
-import com.wakeupdev.weatherforecast.ui.fragments.FavoriteCitiesFragment
-import com.wakeupdev.weatherforecast.ui.fragments.WeatherFragment
+import com.wakeupdev.weatherforecast.presentation.fragments.WeatherFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,13 +28,11 @@ class WeatherActivity : AppCompatActivity() {
         binding = ActivityWeatherBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        supportFragmentManager.commit {
-            val weatherFragment = WeatherFragment()
-
-            replace(R.id.fragmentContainer, weatherFragment)
-            addToBackStack(null)
-        }
-    }
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                replace(R.id.fragmentContainer, WeatherFragment())
+            }
+        }    }
 
     @RequiresApi(Build.VERSION_CODES.S)
     private fun animateSplashScreen() {

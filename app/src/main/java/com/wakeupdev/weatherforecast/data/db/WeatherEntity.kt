@@ -1,4 +1,4 @@
-package com.wakeupdev.weatherforecast.data.db.entities
+package com.wakeupdev.weatherforecast.data.db
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -6,9 +6,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.wakeupdev.weatherforecast.data.DailyForecast
-import com.wakeupdev.weatherforecast.data.HourlyTemperature
-import com.wakeupdev.weatherforecast.data.WeatherData
 
 @Entity(
     tableName = "weather",

@@ -32,7 +32,7 @@
                 tools:node="remove" />
         </provider>
         <activity
-            android:name=".ui.WeatherActivity"
+            android:name=".presentation.WeatherActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

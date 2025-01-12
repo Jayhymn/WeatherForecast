@@ -1,6 +1,6 @@
-package com.wakeupdev.weatherforecast.ui
+package com.wakeupdev.weatherforecast.presentation.uistates
 
-import com.wakeupdev.weatherforecast.data.WeatherData
+import com.wakeupdev.weatherforecast.data.db.WeatherData
 
 sealed interface WeatherUiState {
     data object Idle : WeatherUiState

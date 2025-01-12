@@ -1,4 +1,4 @@
-package com.wakeupdev.weatherforecast.sync
+package com.wakeupdev.weatherforecast.presentation
 
 import android.content.Context
 import android.util.Log
@@ -6,9 +6,11 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.wakeupdev.weatherforecast.utils.NotificationUtils
-import com.wakeupdev.weatherforecast.data.repos.WeatherRepository
+import com.wakeupdev.weatherforecast.data.db.repo.WeatherRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
 @HiltWorker
 class WeatherSyncWorker @AssistedInject constructor(

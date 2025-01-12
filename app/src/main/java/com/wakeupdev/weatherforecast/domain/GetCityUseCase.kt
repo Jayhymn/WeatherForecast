@@ -1,7 +1,7 @@
 package com.wakeupdev.weatherforecast.domain
 
-import com.wakeupdev.weatherforecast.data.api.City
-import com.wakeupdev.weatherforecast.data.repos.CityRepository
+import com.wakeupdev.weatherforecast.data.City
+import com.wakeupdev.weatherforecast.data.db.repo.CityRepository
 import javax.inject.Inject
 
 class GetCityUseCase @Inject constructor(

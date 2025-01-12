@@ -1,5 +1,7 @@
 package com.wakeupdev.weatherforecast.data.api
 
+import com.wakeupdev.weatherforecast.data.City
+
 class GeocodeRes : ArrayList<GeocodeResItem>()
 
 data class GeocodeResItem(

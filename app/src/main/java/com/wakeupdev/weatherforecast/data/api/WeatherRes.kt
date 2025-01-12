@@ -1,10 +1,10 @@
 package com.wakeupdev.weatherforecast.data.api
 
 import com.google.gson.Gson
-import com.wakeupdev.weatherforecast.data.DailyForecast
-import com.wakeupdev.weatherforecast.data.HourlyTemperature
-import com.wakeupdev.weatherforecast.data.WeatherData
-import com.wakeupdev.weatherforecast.data.db.entities.WeatherEntity
+import com.wakeupdev.weatherforecast.data.db.DailyForecast
+import com.wakeupdev.weatherforecast.data.db.HourlyTemperature
+import com.wakeupdev.weatherforecast.data.db.WeatherData
+import com.wakeupdev.weatherforecast.data.db.WeatherEntity
 import com.wakeupdev.weatherforecast.utils.FormatDateUtil
 
 data class WeatherResponse(

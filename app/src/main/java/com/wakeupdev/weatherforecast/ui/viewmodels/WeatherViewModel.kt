@@ -3,7 +3,7 @@ package com.wakeupdev.weatherforecast.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wakeupdev.weatherforecast.domain.GetWeatherUseCase
-import com.wakeupdev.weatherforecast.ui.WeatherUiState
+import com.wakeupdev.weatherforecast.presentation.uistates.WeatherUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

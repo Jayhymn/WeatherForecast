@@ -1,21 +1,20 @@
-package com.wakeupdev.weatherforecast.ui.fragments
+package com.wakeupdev.weatherforecast.presentation.fragments
 
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wakeupdev.weatherforecast.R
-import com.wakeupdev.weatherforecast.data.WeatherData
 import com.wakeupdev.weatherforecast.databinding.FragmentDailyWeatherBinding
-import com.wakeupdev.weatherforecast.ui.adapters.WeatherDailyAdapter
-import com.wakeupdev.weatherforecast.ui.adapters.WeatherHourlyAdapter
+import com.wakeupdev.weatherforecast.data.db.WeatherData
+import com.wakeupdev.weatherforecast.Constants.ARG_WEATHER_DATA
+import com.wakeupdev.weatherforecast.presentation.adapters.WeatherDailyAdapter
+import com.wakeupdev.weatherforecast.presentation.adapters.WeatherHourlyAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,19 +26,14 @@ class DailyWeatherFragment : Fragment(R.layout.fragment_daily_weather) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentDailyWeatherBinding.bind(view)
 
+        // Retrieve the Parcelable data
+        weatherData = arguments?.getParcelable(ARG_WEATHER_DATA)
+            ?: throw IllegalArgumentException("WeatherData is required")
 
-        arguments?.let {
-            weatherData = it.getParcelable("weatherData") ?: throw IllegalArgumentException("Data not found")
-        }
+        binding.tvCityName.text = weatherData.cityName
 
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
+        binding.imgNavBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
-        val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-        actionBar?.title = weatherData.cityName
-        actionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
-
-        // Set up RecyclerViews
         setupRecyclerViews()
 
         setUpMenu()
@@ -72,13 +66,16 @@ class DailyWeatherFragment : Fragment(R.layout.fragment_daily_weather) {
         // Daily Forecast
         binding.rvDailyForecast.layoutManager = LinearLayoutManager(requireContext())
         binding.rvDailyForecast.adapter = WeatherDailyAdapter(weatherData.dailyForecast, requireContext())
-
-        // Add Divider to Daily Forecast
-//        val divider = DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
-//        ContextCompat.getDrawable(requireContext(), R.drawable.custom_divider)?.let { drawable ->
-//            divider.setDrawable(drawable)
-//        }
-//        binding.rvDailyForecast.addItemDecoration(divider)
     }
 
+    companion object {
+        fun newInstance(weatherData: WeatherData): DailyWeatherFragment {
+            val fragment = DailyWeatherFragment()
+            val args = Bundle().apply {
+                putParcelable(ARG_WEATHER_DATA, weatherData)
+            }
+            fragment.arguments = args
+            return fragment
+        }
+    }
 }
